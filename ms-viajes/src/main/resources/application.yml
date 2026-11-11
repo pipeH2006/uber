@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ms-viajes
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/viajes}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: ${PORT:8082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+externo:
+  google-maps-api-key: ${GOOGLE_MAPS_API_KEY:}
+  google-maps-base-url: ${GOOGLE_MAPS_BASE_URL:https://maps.googleapis.com}
+  dolar-base-url: ${DOLAR_BASE_URL:https://open.er-api.com}
+  notificaciones-url: ${NOTIFICACIONES_URL:}

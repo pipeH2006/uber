@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ms-pagos
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pagos}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: ${PORT:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+externo:
+  dolar-base-url: ${EXTERNO_DOLAR_BASE_URL:https://open.er-api.com}
+  open-ai-api-key: ${OPENAI_API_KEY:}
+  open-ai-base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+  notificaciones-url: ${NOTIFICACIONES_URL:}
