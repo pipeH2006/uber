@@ -1,10 +1,12 @@
-# Render Blueprint: despliega los 4 microservicios + 4 bases PostgreSQL.
+# Render Blueprint: despliega los 4 microservicios + 1 base PostgreSQL COMPARTIDA.
 #
-# IMPORTANTE:
-#   - Despliega cada microservicio por separado (mejor que el bloque completo).
-#   - La URL de la BD que inyecta Render (postgres://...) la convierte
-#     DatabaseUrlConfig (infrastructure/config) a una URL JDBC automáticamente.
-#   - Las claves secretas se piden al crear el Blueprint (sync: false).
+# IMPORTANTE (límite del plan gratuito de Render):
+#   - Render free solo permite UNA base PostgreSQL activa por workspace.
+#   - Por eso los 4 microservicios comparten UNA sola base de datos aquí.
+#   - No hay conflicto de tablas: cada microservicio usa nombres distintos
+#     (usuarios, calificaciones, viajes, pagos, notificaciones, plantillas).
+#
+# En LOCAL (docker-compose.yml) sí se usan 4 bases separadas, una por servicio.
 
 services:
   - type: web
@@ -17,10 +19,8 @@ services:
     envVars:
       - key: DB_URL
         fromDatabase:
-          name: uber-usuarios-db
+          name: uber-db
           property: connectionString
-      - key: PORT
-        value: "8081"
 
   - type: web
     name: uber-ms-viajes
@@ -32,10 +32,8 @@ services:
     envVars:
       - key: DB_URL
         fromDatabase:
-          name: uber-viajes-db
+          name: uber-db
           property: connectionString
-      - key: PORT
-        value: "8082"
       - key: GOOGLE_MAPS_API_KEY
         sync: false
       - key: NOTIFICACIONES_URL
@@ -51,10 +49,8 @@ services:
     envVars:
       - key: DB_URL
         fromDatabase:
-          name: uber-pagos-db
+          name: uber-db
           property: connectionString
-      - key: PORT
-        value: "8083"
       - key: OPENAI_API_KEY
         sync: false
       - key: NOTIFICACIONES_URL
@@ -70,19 +66,11 @@ services:
     envVars:
       - key: DB_URL
         fromDatabase:
-          name: uber-notificaciones-db
+          name: uber-db
           property: connectionString
-      - key: PORT
-        value: "8084"
       - key: TELEGRAM_BOT_TOKEN
         sync: false
 
 databases:
-  - name: uber-usuarios-db
-    plan: free
-  - name: uber-viajes-db
-    plan: free
-  - name: uber-pagos-db
-    plan: free
-  - name: uber-notificaciones-db
+  - name: uber-db
     plan: free

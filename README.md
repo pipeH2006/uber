@@ -270,6 +270,8 @@ El reporte queda en `target/site/jacoco/index.html`.
 ## 10. Despliegue en Render (por microservicio)
 
 > ⚠️ Despliega **cada microservicio por separado**, no el bloque completo.
+>
+> **Nota sobre el plan gratuito:** Render free solo permite **1 base PostgreSQL activa** por cuenta. Por eso, en Render los 4 microservicios **comparten una sola base de datos** (`uber-db`) — no hay conflicto porque cada servicio usa tablas con nombres distintos. En local (`docker-compose.yml`) sí se usan 4 bases separadas.
 
 ### Opción A — Blueprint (todo de una vez, opcional)
 
