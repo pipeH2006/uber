@@ -93,7 +93,7 @@
                 <configuration>
                     <excludes>
                         <exclude>com/uber/viajes/ViajesApplication.class</exclude>
-                        <exclude>com/uber/viajes/infrastructure/config/*</exclude>
+                        <exclude>com/uber/viajes/application/config/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

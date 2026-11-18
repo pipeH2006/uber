@@ -93,7 +93,7 @@
                 <configuration>
                     <excludes>
                         <exclude>com/uber/usuarios/UsuariosApplication.class</exclude>
-                        <exclude>com/uber/usuarios/infrastructure/config/*</exclude>
+                        <exclude>com/uber/usuarios/application/config/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

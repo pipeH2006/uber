@@ -93,7 +93,7 @@
                 <configuration>
                     <excludes>
                         <exclude>com/uber/notificaciones/NotificacionesApplication.class</exclude>
-                        <exclude>com/uber/notificaciones/infrastructure/config/*</exclude>
+                        <exclude>com/uber/notificaciones/application/config/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

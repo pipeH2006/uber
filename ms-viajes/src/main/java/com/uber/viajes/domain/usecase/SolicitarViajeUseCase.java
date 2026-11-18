@@ -1,0 +1,44 @@
+package com.uber.viajes.domain.usecase;
+
+import com.uber.viajes.domain.model.Coordenada;
+import com.uber.viajes.domain.model.EstadoViaje;
+import com.uber.viajes.domain.model.Estimacion;
+import com.uber.viajes.domain.model.Viaje;
+import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.ViajeGateway;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@RequiredArgsConstructor
+public class SolicitarViajeUseCase {
+
+    private final EstimarViajeUseCase estimarViajeUseCase;
+    private final NotificacionGateway notificacionGateway;
+    private final ViajeGateway viajeGateway;
+
+    public Viaje solicitar(Long pasajeroId, Long conductorId, Coordenada origen, Coordenada destino) {
+        // La estimación (ruta + tarifa USD/COP) se obtiene a través del caso de uso de estimación,
+        // que a su vez invoca MapsGateway.calcularRuta y TipoCambioGateway.obtenerTipoCambio("COP").
+        Estimacion estimacion = estimarViajeUseCase.estimar(origen, destino);
+
+        Viaje viaje = Viaje.builder()
+                .pasajeroId(pasajeroId)
+                .conductorId(conductorId)
+                .origenLat(origen.lat())
+                .origenLng(origen.lng())
+                .destinoLat(destino.lat())
+                .destinoLng(destino.lng())
+                .distanciaKm(estimacion.distanciaKm())
+                .duracionMin(estimacion.duracionMin())
+                .costoEstimado(estimacion.costoUSD())
+                .moneda("USD")
+                .estado(EstadoViaje.ASIGNADO)
+                .fechaSolicitud(LocalDateTime.now())
+                .build();
+
+        Viaje guardado = viajeGateway.guardar(viaje);
+        notificacionGateway.notificar("conductor-" + conductorId, "Se te ha asignado un nuevo viaje");
+        return guardado;
+    }
+}

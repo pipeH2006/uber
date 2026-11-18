@@ -65,25 +65,27 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
 
 ## 3. Arquitectura Hexagonal (Limpia)
 
-Cada microservicio sigue la misma estructura de puertos y adaptadores:
+Cada microservicio sigue la misma estructura de **puertos y adaptadores**, con los **casos de uso dentro del dominio**:
 
 ```
 com.uber.<servicio>
-├── domain/                     # Núcleo: modelo, enums, excepciones (sin dependencias)
-│   ├── model/
-│   └── exception/
+├── domain/                        # Núcleo: entidades + casos de uso + gateways (sin Spring)
+│   ├── model/                     # entidades, enums, value objects
+│   │   └── gateway/               # puertos de salida (interfaces)
+│   ├── exception/                 # excepciones de dominio
+│   └── usecase/                   # casos de uso (clases concretas con la lógica de negocio)
 ├── application/
-│   ├── port/in/                # Puertos de entrada (casos de uso)
-│   ├── port/out/               # Puertos de salida (persistencia, APIs externas)
-│   └── service/                # Implementación de los casos de uso
-└── infrastructure/
-    ├── adapter/in/rest/        # Controladores REST + DTOs + manejo de errores
-    ├── adapter/out/persistence/# JPA: entidades + repositorios + adaptadores
-    ├── adapter/out/client/     # Clientes HTTP de APIs externas (RestClient)
-    └── config/                 # Configuración (beans, propiedades externas)
+│   └── config/                    # beans de config (UseCaseConfig, clientes, BD)
+└── infraestructure/               # adaptadores (conectan el dominio con el exterior)
+    ├── entry_points/              # controladores REST + DTOs + manejo de errores
+    ├── driver_adapters/
+    │   ├── jpa_repository/        # JPA: *Data + repositorios + *DataGatewayImpl
+    │   └── external_repository/   # clientes HTTP de APIs externas (RestClient)
+    └── mapper/                    # mapeo dominio ↔ JPA
 ```
 
-El dominio **no conoce** Spring, JPA ni HTTP. La lógica de negocio vive en `application/service` y depende solo de interfaces (`port/in` y `port/out`). Los adaptadores conectan el núcleo con el mundo exterior.
+- Los **casos de uso** viven en `domain/usecase` (clases concretas con `@RequiredArgsConstructor`), se registran como `@Bean` en `application/config/UseCaseConfig`, y dependen solo de **gateways** (interfaces en `domain/model/gateway`).
+- El dominio **no conoce** Spring, JPA ni HTTP. Los adaptadores (`infraestructure/`) implementan los gateways y conectan el núcleo con el mundo exterior.
 
 ---
 

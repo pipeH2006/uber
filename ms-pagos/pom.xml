@@ -93,7 +93,7 @@
                 <configuration>
                     <excludes>
                         <exclude>com/uber/pagos/PagosApplication.class</exclude>
-                        <exclude>com/uber/pagos/infrastructure/config/*</exclude>
+                        <exclude>com/uber/pagos/application/config/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
