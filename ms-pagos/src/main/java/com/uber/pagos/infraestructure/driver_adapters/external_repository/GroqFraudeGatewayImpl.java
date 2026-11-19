@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class GroqFraudeGatewayImpl implements FraudeGateway {
 
-    private static final String MODEL = "llama-3.3-70b-versatile";
+    private static final String MODEL = "openai/gpt-oss-120b";
     private static final String SYSTEM_PROMPT =
             "Eres un analista de riesgo de fraude para pagos de una plataforma de transporte. "
             + "Analiza los datos del pago y responde ÚNICAMENTE con un objeto JSON que contenga los campos: "
@@ -55,7 +55,11 @@ public class GroqFraudeGatewayImpl implements FraudeGateway {
                 throw new ErrorExternoException("La respuesta del servicio de IA no contiene opciones");
             }
             String content = choices.get(0).path("message").path("content").asText();
-            return objectMapper.readValue(content, ResultadoFraude.class);
+            ResultadoFraude resultado = objectMapper.readValue(content, ResultadoFraude.class);
+            return new ResultadoFraude(
+                    resultado.riesgo().toUpperCase(),
+                    resultado.score(),
+                    resultado.justificacion());
         } catch (ErrorExternoException e) {
             throw e;
         } catch (Exception e) {
