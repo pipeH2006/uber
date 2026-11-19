@@ -20,7 +20,7 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
    │  :8081   │            │   :8082    │            │    :8083     │
    └──────────┘            └─────┬──────┘            └──────┬───────┘
         │                        │                          │
-        │             OSRM (OSM) │ + API dólar      API dólar│ + OpenAI
+        │             OSRM (OSM) │ + API dólar      API dólar│ + Groq (IA)
         │                        │                          │
         │                        └──────────┬───────────────┘
         │                                   │ (HTTP)
@@ -41,10 +41,10 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
 |---|---|---|---|
 | `ms-usuarios` | 8081 | Pasajeros, conductores, login, verificación de documentos, calificaciones | — |
 | `ms-viajes` | 8082 | Viajes: estimar tarifa, solicitar, iniciar, finalizar, cancelar, seguimiento | **OSRM** + **API de dólar** |
-| `ms-pagos` | 8083 | Pagos: procesar, reembolsar, factura, análisis de fraude, tipo de cambio, resumen | **API de dólar** + **OpenAI (IA)** |
+| `ms-pagos` | 8083 | Pagos: procesar, reembolsar, factura, análisis de fraude, tipo de cambio, resumen | **API de dólar** + **Groq (IA)** |
 | `ms-notificaciones` | 8084 | Notificaciones (correo/chat) por **Telegram** | **Telegram Bot API** |
 
-**APIs externas consumidas:** OSRM (Open Source Routing Machine, open source), API de dólar (open.er-api.com) y OpenAI. La API de notificación (Telegram) **no** cuenta como una de las 2 externas obligatorias; es el canal del sistema de notificaciones.
+**APIs externas consumidas:** OSRM (Open Source Routing Machine, open source), API de dólar (open.er-api.com) y Groq (IA con modelos open source tipo Llama). La API de notificación (Telegram) **no** cuenta como una de las 2 externas obligatorias; es el canal del sistema de notificaciones.
 
 ---
 
@@ -135,7 +135,7 @@ com.uber.<servicio>
 | POST | `/pagos/procesar` | Procesar un pago |
 | POST | `/pagos/{id}/reembolsar` | Reembolsar un pago |
 | GET | `/pagos/{id}/factura` | Generar factura (USD → COP) |
-| POST | `/pagos/{id}/evaluar-fraude` | Análisis de fraude con IA (OpenAI) |
+| POST | `/pagos/{id}/evaluar-fraude` | Análisis de fraude con IA (Groq) |
 | GET | `/pagos/tipo-cambio?moneda=COP` | Tipo de cambio actual |
 | GET | `/pagos/resumen?fecha=2026-11-11` | Resumen de ingresos del día |
 
@@ -163,7 +163,7 @@ com.uber.<servicio>
 
 1. **OSRM — Open Source Routing Machine** (`ms-viajes`): calcula distancia y duración entre origen y destino (open source, basado en OpenStreetMap, sin API key).
 2. **API de dólar** (`open.er-api.com`, `ms-viajes` y `ms-pagos`): tipo de cambio USD → COP para tarifas y facturas.
-3. **OpenAI** (`ms-pagos`): análisis de riesgo de fraude sobre los pagos.
+3. **Groq** (`ms-pagos`): análisis de riesgo de fraude sobre los pagos (IA con modelos open source, plan gratuito sin tarjeta).
 
 Además, **Telegram Bot API** (`ms-notificaciones`) es el canal del sistema de notificaciones.
 
@@ -240,7 +240,7 @@ Ver `.env.example`. Las más importantes:
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | todos | Conexión PostgreSQL (acepta `jdbc:postgresql://...` o `postgres://...`) |
 | `PORT` | todos | Puerto del microservicio |
 | `OSRM_BASE_URL` | viajes | URL base de OSRM (opcional) |
-| `OPENAI_API_KEY` | pagos | Clave de OpenAI |
+| `GROQ_API_KEY` | pagos | Clave de Groq (gratis) |
 | `TELEGRAM_BOT_TOKEN` | notificaciones | Token del bot de Telegram |
 | `NOTIFICACIONES_URL` | viajes, pagos | URL de `ms-notificaciones` (para notificar eventos) |
 
@@ -280,7 +280,7 @@ El reporte queda en `target/site/jacoco/index.html`.
 1. Sube este repositorio a GitHub.
 2. En Render: **New → Blueprint** y conecta el repo.
 3. Render leerá `render.yaml` y creará los 4 servicios + 4 bases PostgreSQL.
-4. Ingresa las claves (`OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
+4. Ingresa las claves (`GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
 
 ### Opción B — Manual (lo que suele mostrar el profe)
 
@@ -329,7 +329,7 @@ Los scripts incluyen *thresholds* (`http_req_duration: p(95)<500`) que hacen fal
 | ≥ 3 microservicios (4 en total) | ✅ |
 | Sistema de notificaciones (Telegram) | ✅ |
 | 5 APIs no-CRUD por microservicio (20 totales) | ✅ |
-| ≥ 2 APIs externas (OSRM + dólar + OpenAI) | ✅ |
+| ≥ 2 APIs externas (OSRM + dólar + Groq) | ✅ |
 | Desplegado por microservicio (Docker + Render) | ✅ |
 | Cobertura ≥ 90% por microservicio | ✅ (JaCoCo) |
 | Pruebas de carga y estrés sobre APIs desplegadas | ✅ (k6) |

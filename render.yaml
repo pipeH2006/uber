@@ -51,7 +51,7 @@ services:
         fromDatabase:
           name: uber-db
           property: connectionString
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
       - key: NOTIFICACIONES_URL
         value: "https://uber-ms-notificaciones.onrender.com"

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class OpenAiFraudeGatewayImplTest {
+class GroqFraudeGatewayImplTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private MockWebServer server;
@@ -53,7 +53,7 @@ class OpenAiFraudeGatewayImplTest {
 
     @Test
     void evaluar_apiKeyEnBlanco_devuelveSimulacion() {
-        OpenAiFraudeGatewayImpl gateway = new OpenAiFraudeGatewayImpl(restClient, "", objectMapper);
+        GroqFraudeGatewayImpl gateway = new GroqFraudeGatewayImpl(restClient, "", objectMapper);
 
         ResultadoFraude resultado = gateway.evaluar(pago());
 
@@ -64,7 +64,7 @@ class OpenAiFraudeGatewayImplTest {
 
     @Test
     void evaluar_apiKeyNula_devuelveSimulacion() {
-        OpenAiFraudeGatewayImpl gateway = new OpenAiFraudeGatewayImpl(restClient, null, objectMapper);
+        GroqFraudeGatewayImpl gateway = new GroqFraudeGatewayImpl(restClient, null, objectMapper);
 
         ResultadoFraude resultado = gateway.evaluar(pago());
 
@@ -78,7 +78,7 @@ class OpenAiFraudeGatewayImplTest {
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
                 .setBody(body));
-        OpenAiFraudeGatewayImpl gateway = new OpenAiFraudeGatewayImpl(restClient, "sk-test", objectMapper);
+        GroqFraudeGatewayImpl gateway = new GroqFraudeGatewayImpl(restClient, "sk-test", objectMapper);
 
         ResultadoFraude resultado = gateway.evaluar(pago());
 
@@ -92,7 +92,7 @@ class OpenAiFraudeGatewayImplTest {
         server.enqueue(new MockResponse()
                 .setHeader("Content-Type", "application/json")
                 .setBody("{\"choices\":[]}"));
-        OpenAiFraudeGatewayImpl gateway = new OpenAiFraudeGatewayImpl(restClient, "sk-test", objectMapper);
+        GroqFraudeGatewayImpl gateway = new GroqFraudeGatewayImpl(restClient, "sk-test", objectMapper);
 
         assertThatThrownBy(() -> gateway.evaluar(pago()))
                 .isInstanceOf(ErrorExternoException.class);
@@ -101,7 +101,7 @@ class OpenAiFraudeGatewayImplTest {
     @Test
     void evaluar_errorHttp_lanzaErrorExterno() {
         server.enqueue(new MockResponse().setResponseCode(500));
-        OpenAiFraudeGatewayImpl gateway = new OpenAiFraudeGatewayImpl(restClient, "sk-test", objectMapper);
+        GroqFraudeGatewayImpl gateway = new GroqFraudeGatewayImpl(restClient, "sk-test", objectMapper);
 
         assertThatThrownBy(() -> gateway.evaluar(pago()))
                 .isInstanceOf(ErrorExternoException.class);

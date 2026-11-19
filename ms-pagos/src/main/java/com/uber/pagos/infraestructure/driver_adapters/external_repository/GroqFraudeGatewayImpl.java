@@ -12,9 +12,13 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.Map;
 
-public class OpenAiFraudeGatewayImpl implements FraudeGateway {
+/**
+ * Adaptador del gateway de fraude usando Groq (inferencia de modelos
+ * open source tipo Llama, con API compatible con OpenAI y plan gratuito).
+ */
+public class GroqFraudeGatewayImpl implements FraudeGateway {
 
-    private static final String MODEL = "gpt-4o-mini";
+    private static final String MODEL = "llama-3.3-70b-versatile";
     private static final String SYSTEM_PROMPT =
             "Eres un analista de riesgo de fraude para pagos de una plataforma de transporte. "
             + "Analiza los datos del pago y responde ÚNICAMENTE con un objeto JSON que contenga los campos: "
@@ -25,7 +29,7 @@ public class OpenAiFraudeGatewayImpl implements FraudeGateway {
     private final String apiKey;
     private final ObjectMapper objectMapper;
 
-    public OpenAiFraudeGatewayImpl(RestClient restClient, String apiKey, ObjectMapper objectMapper) {
+    public GroqFraudeGatewayImpl(RestClient restClient, String apiKey, ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.apiKey = apiKey;
         this.objectMapper = objectMapper;
