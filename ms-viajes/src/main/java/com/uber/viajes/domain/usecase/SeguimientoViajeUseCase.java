@@ -5,7 +5,7 @@ import com.uber.viajes.domain.model.Coordenada;
 import com.uber.viajes.domain.model.Ruta;
 import com.uber.viajes.domain.model.Seguimiento;
 import com.uber.viajes.domain.model.Viaje;
-import com.uber.viajes.domain.model.gateway.MapsGateway;
+import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import lombok.RequiredArgsConstructor;
 
@@ -13,13 +13,13 @@ import lombok.RequiredArgsConstructor;
 public class SeguimientoViajeUseCase {
 
     private final ViajeGateway viajeGateway;
-    private final MapsGateway mapsGateway;
+    private final RutasGateway rutasGateway;
 
     public Seguimiento seguir(Long id) {
         Viaje viaje = viajeGateway.buscarPorId(id)
                 .orElseThrow(() -> new ViajeNoEncontradoException(id));
 
-        Ruta ruta = mapsGateway.calcularRuta(
+        Ruta ruta = rutasGateway.calcularRuta(
                 new Coordenada(viaje.getOrigenLat(), viaje.getOrigenLng()),
                 new Coordenada(viaje.getDestinoLat(), viaje.getDestinoLng()));
 

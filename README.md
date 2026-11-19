@@ -20,7 +20,7 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
    │  :8081   │            │   :8082    │            │    :8083     │
    └──────────┘            └─────┬──────┘            └──────┬───────┘
         │                        │                          │
-        │             Google Maps│ + API dólar      API dólar│ + OpenAI
+        │             OSRM (OSM) │ + API dólar      API dólar│ + OpenAI
         │                        │                          │
         │                        └──────────┬───────────────┘
         │                                   │ (HTTP)
@@ -40,11 +40,11 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
 | Microservicio | Puerto | Responsabilidad | APIs externas |
 |---|---|---|---|
 | `ms-usuarios` | 8081 | Pasajeros, conductores, login, verificación de documentos, calificaciones | — |
-| `ms-viajes` | 8082 | Viajes: estimar tarifa, solicitar, iniciar, finalizar, cancelar, seguimiento | **Google Maps** + **API de dólar** |
+| `ms-viajes` | 8082 | Viajes: estimar tarifa, solicitar, iniciar, finalizar, cancelar, seguimiento | **OSRM** + **API de dólar** |
 | `ms-pagos` | 8083 | Pagos: procesar, reembolsar, factura, análisis de fraude, tipo de cambio, resumen | **API de dólar** + **OpenAI (IA)** |
 | `ms-notificaciones` | 8084 | Notificaciones (correo/chat) por **Telegram** | **Telegram Bot API** |
 
-**APIs externas consumidas:** Google Maps Distance Matrix, API de dólar (open.er-api.com) y OpenAI. La API de notificación (Telegram) **no** cuenta como una de las 2 externas obligatorias; es el canal del sistema de notificaciones.
+**APIs externas consumidas:** OSRM (Open Source Routing Machine, open source), API de dólar (open.er-api.com) y OpenAI. La API de notificación (Telegram) **no** cuenta como una de las 2 externas obligatorias; es el canal del sistema de notificaciones.
 
 ---
 
@@ -116,7 +116,7 @@ com.uber.<servicio>
 | GET | `/viajes` | Listar (CRUD) |
 | PUT | `/viajes/{id}` | Actualizar (CRUD) |
 | DELETE | `/viajes/{id}` | Eliminar (CRUD) |
-| POST | `/viajes/estimar` | Estimar tarifa (Google Maps + dólar) |
+| POST | `/viajes/estimar` | Estimar tarifa (OSRM + dólar) |
 | POST | `/viajes/solicitar` | Solicitar viaje y asignar conductor |
 | POST | `/viajes/{id}/iniciar` | Iniciar viaje |
 | POST | `/viajes/{id}/finalizar` | Finalizar viaje (calcula costo final) |
@@ -161,7 +161,7 @@ com.uber.<servicio>
 
 ## 5. APIs externas (3)
 
-1. **Google Maps — Distance Matrix API** (`ms-viajes`): calcula distancia y duración entre origen y destino.
+1. **OSRM — Open Source Routing Machine** (`ms-viajes`): calcula distancia y duración entre origen y destino (open source, basado en OpenStreetMap, sin API key).
 2. **API de dólar** (`open.er-api.com`, `ms-viajes` y `ms-pagos`): tipo de cambio USD → COP para tarifas y facturas.
 3. **OpenAI** (`ms-pagos`): análisis de riesgo de fraude sobre los pagos.
 
@@ -213,7 +213,7 @@ curl -X POST http://localhost:8081/api/v1/usuarios \
   -H "Content-Type: application/json" \
   -d '{"nombre":"Ana","email":"ana@correo.com","telefono":"300123","contrasena":"secreto","rol":"PASAJERO"}'
 
-# 2. Estimar una tarifa (usa Google Maps + dólar)
+# 2. Estimar una tarifa (usa OSRM + dólar)
 curl -X POST http://localhost:8082/api/v1/viajes/estimar \
   -H "Content-Type: application/json" \
   -d '{"origenLat":4.7110,"origenLng":-74.0721,"destinoLat":4.6533,"destinoLng":-74.0836}'
@@ -239,7 +239,7 @@ Ver `.env.example`. Las más importantes:
 |---|---|---|
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | todos | Conexión PostgreSQL (acepta `jdbc:postgresql://...` o `postgres://...`) |
 | `PORT` | todos | Puerto del microservicio |
-| `GOOGLE_MAPS_API_KEY` | viajes | Clave de Google Maps |
+| `OSRM_BASE_URL` | viajes | URL base de OSRM (opcional) |
 | `OPENAI_API_KEY` | pagos | Clave de OpenAI |
 | `TELEGRAM_BOT_TOKEN` | notificaciones | Token del bot de Telegram |
 | `NOTIFICACIONES_URL` | viajes, pagos | URL de `ms-notificaciones` (para notificar eventos) |
@@ -280,7 +280,7 @@ El reporte queda en `target/site/jacoco/index.html`.
 1. Sube este repositorio a GitHub.
 2. En Render: **New → Blueprint** y conecta el repo.
 3. Render leerá `render.yaml` y creará los 4 servicios + 4 bases PostgreSQL.
-4. Ingresa las claves (`GOOGLE_MAPS_API_KEY`, `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida.
+4. Ingresa las claves (`OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
 
 ### Opción B — Manual (lo que suele mostrar el profe)
 
@@ -329,7 +329,7 @@ Los scripts incluyen *thresholds* (`http_req_duration: p(95)<500`) que hacen fal
 | ≥ 3 microservicios (4 en total) | ✅ |
 | Sistema de notificaciones (Telegram) | ✅ |
 | 5 APIs no-CRUD por microservicio (20 totales) | ✅ |
-| ≥ 2 APIs externas (Google Maps + dólar + OpenAI) | ✅ |
+| ≥ 2 APIs externas (OSRM + dólar + OpenAI) | ✅ |
 | Desplegado por microservicio (Docker + Render) | ✅ |
 | Cobertura ≥ 90% por microservicio | ✅ (JaCoCo) |
 | Pruebas de carga y estrés sobre APIs desplegadas | ✅ (k6) |

@@ -34,8 +34,8 @@ services:
         fromDatabase:
           name: uber-db
           property: connectionString
-      - key: GOOGLE_MAPS_API_KEY
-        sync: false
+      - key: OSRM_BASE_URL
+        value: "https://router.project-osrm.org"
       - key: NOTIFICACIONES_URL
         value: "https://uber-ms-notificaciones.onrender.com"
 

@@ -4,7 +4,7 @@ import com.uber.viajes.domain.exception.ErrorExternoException;
 import com.uber.viajes.domain.model.Coordenada;
 import com.uber.viajes.domain.model.Estimacion;
 import com.uber.viajes.domain.model.Ruta;
-import com.uber.viajes.domain.model.gateway.MapsGateway;
+import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class EstimarViajeUseCaseTest {
 
     @Mock
-    private MapsGateway mapsGateway;
+    private RutasGateway rutasGateway;
 
     @Mock
     private TipoCambioGateway tipoCambioGateway;
@@ -31,14 +31,14 @@ class EstimarViajeUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        useCase = new EstimarViajeUseCase(mapsGateway, tipoCambioGateway);
+        useCase = new EstimarViajeUseCase(rutasGateway, tipoCambioGateway);
     }
 
     @Test
     void estimar_calculaCostoUsdYCopCorrectamente() {
         Coordenada origen = new Coordenada(4.71, -74.07);
         Coordenada destino = new Coordenada(4.60, -74.08);
-        when(mapsGateway.calcularRuta(origen, destino)).thenReturn(new Ruta(10.0, 20.0));
+        when(rutasGateway.calcularRuta(origen, destino)).thenReturn(new Ruta(10.0, 20.0));
         when(tipoCambioGateway.obtenerTipoCambio("COP")).thenReturn(new BigDecimal("4000"));
 
         Estimacion estimacion = useCase.estimar(origen, destino);
@@ -55,7 +55,7 @@ class EstimarViajeUseCaseTest {
     void estimar_redondeaCostoUsdADosDecimales() {
         Coordenada origen = new Coordenada(4.71, -74.07);
         Coordenada destino = new Coordenada(4.60, -74.08);
-        when(mapsGateway.calcularRuta(origen, destino)).thenReturn(new Ruta(5.0, 7.5));
+        when(rutasGateway.calcularRuta(origen, destino)).thenReturn(new Ruta(5.0, 7.5));
         when(tipoCambioGateway.obtenerTipoCambio("COP")).thenReturn(new BigDecimal("4000"));
 
         Estimacion estimacion = useCase.estimar(origen, destino);
@@ -68,7 +68,7 @@ class EstimarViajeUseCaseTest {
     void estimar_errorExterno_lanzaExcepcion() {
         Coordenada origen = new Coordenada(4.71, -74.07);
         Coordenada destino = new Coordenada(4.60, -74.08);
-        when(mapsGateway.calcularRuta(origen, destino)).thenThrow(new ErrorExternoException("fallo externo"));
+        when(rutasGateway.calcularRuta(origen, destino)).thenThrow(new ErrorExternoException("fallo externo"));
 
         assertThatThrownBy(() -> useCase.estimar(origen, destino))
                 .isInstanceOf(ErrorExternoException.class);

@@ -19,7 +19,7 @@ public class SolicitarViajeUseCase {
 
     public Viaje solicitar(Long pasajeroId, Long conductorId, Coordenada origen, Coordenada destino) {
         // La estimación (ruta + tarifa USD/COP) se obtiene a través del caso de uso de estimación,
-        // que a su vez invoca MapsGateway.calcularRuta y TipoCambioGateway.obtenerTipoCambio("COP").
+        // que a su vez invoca RutasGateway.calcularRuta y TipoCambioGateway.obtenerTipoCambio("COP").
         Estimacion estimacion = estimarViajeUseCase.estimar(origen, destino);
 
         Viaje viaje = Viaje.builder()

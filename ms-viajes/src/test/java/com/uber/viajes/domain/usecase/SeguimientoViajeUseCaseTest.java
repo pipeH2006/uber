@@ -6,7 +6,7 @@ import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Ruta;
 import com.uber.viajes.domain.model.Seguimiento;
 import com.uber.viajes.domain.model.Viaje;
-import com.uber.viajes.domain.model.gateway.MapsGateway;
+import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,13 +28,13 @@ class SeguimientoViajeUseCaseTest {
     private ViajeGateway viajeGateway;
 
     @Mock
-    private MapsGateway mapsGateway;
+    private RutasGateway rutasGateway;
 
     private SeguimientoViajeUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new SeguimientoViajeUseCase(viajeGateway, mapsGateway);
+        useCase = new SeguimientoViajeUseCase(viajeGateway, rutasGateway);
     }
 
     @Test
@@ -47,7 +47,7 @@ class SeguimientoViajeUseCaseTest {
                 .estado(EstadoViaje.EN_CURSO)
                 .build();
         when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
-        when(mapsGateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
+        when(rutasGateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
                 .thenReturn(new Ruta(12.5, 15.0));
 
         Seguimiento seguimiento = useCase.seguir(1L);

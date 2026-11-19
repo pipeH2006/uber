@@ -45,7 +45,7 @@ export default function () {
   const usuarios = http.get(`${BASE_USUARIOS}/api/v1/usuarios`);
   const plantillas = http.get(`${BASE_NOTIF}/api/v1/notificaciones/plantillas`);
 
-  // Operación con llamadas externas (Google Maps + API de dólar)
+  // Operación con llamadas externas (OSRM + API de dólar)
   const estimar = http.post(
     `${BASE_VIAJES}/api/v1/viajes/estimar`,
     JSON.stringify({

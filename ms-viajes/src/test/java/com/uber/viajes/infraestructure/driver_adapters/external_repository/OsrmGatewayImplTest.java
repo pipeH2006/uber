@@ -16,7 +16,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class GoogleMapsGatewayImplTest {
+class OsrmGatewayImplTest {
 
     private MockWebServer mockWebServer;
     private RestClient restClient;
@@ -35,11 +35,11 @@ class GoogleMapsGatewayImplTest {
 
     @Test
     void calcularRuta_respuestaValida_convierteMetrosYSegundos() throws Exception {
-        GoogleMapsGatewayImpl gateway = new GoogleMapsGatewayImpl(restClient, "fake-key");
+        OsrmGatewayImpl gateway = new OsrmGatewayImpl(restClient);
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .addHeader("Content-Type", "application/json")
-                .setBody("{\"status\":\"OK\",\"rows\":[{\"elements\":[{\"distance\":{\"value\":12500},\"duration\":{\"value\":900}}]}]}"));
+                .setBody("{\"code\":\"Ok\",\"routes\":[{\"distance\":12500.0,\"duration\":900.0}]}"));
 
         Ruta ruta = gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08));
 
@@ -47,41 +47,20 @@ class GoogleMapsGatewayImplTest {
         assertThat(ruta.duracionMin()).isEqualTo(15.0);
 
         RecordedRequest request = mockWebServer.takeRequest();
-        assertThat(request.getPath()).startsWith("/maps/api/distancematrix/json");
-        assertThat(request.getRequestUrl().queryParameter("origins")).isEqualTo("4.71,-74.07");
-        assertThat(request.getRequestUrl().queryParameter("destinations")).isEqualTo("4.6,-74.08");
-        assertThat(request.getRequestUrl().queryParameter("key")).isEqualTo("fake-key");
-        assertThat(request.getRequestUrl().queryParameter("units")).isEqualTo("metric");
+        assertThat(request.getPath()).startsWith("/route/v1/driving/");
+        assertThat(request.getPath()).contains("-74.07,4.71;-74.08,4.6");
+        assertThat(request.getPath()).contains("overview=false");
     }
 
     @Test
-    void calcularRuta_estadoNoOk_lanzaErrorExterno() {
-        GoogleMapsGatewayImpl gateway = new GoogleMapsGatewayImpl(restClient, "fake-key");
+    void calcularRuta_codigoNoOk_lanzaErrorExterno() {
+        OsrmGatewayImpl gateway = new OsrmGatewayImpl(restClient);
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .addHeader("Content-Type", "application/json")
-                .setBody("{\"status\":\"ZERO_RESULTS\",\"rows\":[]}"));
+                .setBody("{\"code\":\"NoRoute\",\"routes\":[]}"));
 
         assertThatThrownBy(() -> gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
                 .isInstanceOf(ErrorExternoException.class);
-    }
-
-    @Test
-    void calcularRuta_apiKeyVacia_devuelveRutaSimulada() {
-        GoogleMapsGatewayImpl gateway = new GoogleMapsGatewayImpl(restClient, "");
-
-        Ruta ruta = gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08));
-
-        assertThat(ruta).isEqualTo(new Ruta(5.0, 10.0));
-        assertThat(mockWebServer.getRequestCount()).isZero();
-    }
-
-    @Test
-    void calcularRuta_apiKeyNula_devuelveRutaSimulada() {
-        GoogleMapsGatewayImpl gateway = new GoogleMapsGatewayImpl(restClient, null);
-
-        Ruta ruta = gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08));
-
-        assertThat(ruta).isEqualTo(new Ruta(5.0, 10.0));
     }
 }

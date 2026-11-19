@@ -1,11 +1,11 @@
 package com.uber.viajes.application.config;
 
-import com.uber.viajes.domain.model.gateway.MapsGateway;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.DolarApiGatewayImpl;
-import com.uber.viajes.infraestructure.driver_adapters.external_repository.GoogleMapsGatewayImpl;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.NotificacionRestGatewayImpl;
+import com.uber.viajes.infraestructure.driver_adapters.external_repository.OsrmGatewayImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +23,9 @@ public class RestClientConfig {
     private static final Duration READ_TIMEOUT = Duration.ofSeconds(5);
 
     @Bean
-    public RestClient googleMapsRestClient(ExternalProperties props) {
+    public RestClient osrmRestClient(ExternalProperties props) {
         return RestClient.builder()
-                .baseUrl(props.googleMapsBaseUrl())
+                .baseUrl(props.osrmBaseUrl())
                 .requestFactory(clientHttpRequestFactory())
                 .build();
     }
@@ -49,8 +49,8 @@ public class RestClientConfig {
     }
 
     @Bean
-    public MapsGateway mapsGateway(RestClient googleMapsRestClient, ExternalProperties props) {
-        return new GoogleMapsGatewayImpl(googleMapsRestClient, props.googleMapsApiKey());
+    public RutasGateway rutasGateway(RestClient osrmRestClient) {
+        return new OsrmGatewayImpl(osrmRestClient);
     }
 
     @Bean

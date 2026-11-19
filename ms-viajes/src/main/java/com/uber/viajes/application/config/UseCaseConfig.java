@@ -1,7 +1,7 @@
 package com.uber.viajes.application.config;
 
-import com.uber.viajes.domain.model.gateway.MapsGateway;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import com.uber.viajes.domain.usecase.CancelarViajeUseCase;
@@ -27,9 +27,9 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public EstimarViajeUseCase estimarViajeUseCase(MapsGateway mapsGateway,
+    public EstimarViajeUseCase estimarViajeUseCase(RutasGateway rutasGateway,
                                                     TipoCambioGateway tipoCambioGateway) {
-        return new EstimarViajeUseCase(mapsGateway, tipoCambioGateway);
+        return new EstimarViajeUseCase(rutasGateway, tipoCambioGateway);
     }
 
     @Bean
@@ -57,7 +57,7 @@ public class UseCaseConfig {
 
     @Bean
     public SeguimientoViajeUseCase seguimientoViajeUseCase(ViajeGateway viajeGateway,
-                                                           MapsGateway mapsGateway) {
-        return new SeguimientoViajeUseCase(viajeGateway, mapsGateway);
+                                                           RutasGateway rutasGateway) {
+        return new SeguimientoViajeUseCase(viajeGateway, rutasGateway);
     }
 }
