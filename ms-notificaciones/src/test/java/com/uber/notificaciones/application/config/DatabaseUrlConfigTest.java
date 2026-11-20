@@ -24,4 +24,30 @@ class DatabaseUrlConfigTest {
         assertThat(result.username()).isEqualTo("user");
         assertThat(result.password()).isEqualTo("pass");
     }
+
+    @Test
+    void parse_urlNeonConSslmode_conservaLaQuery() {
+        DatabaseUrl result = DatabaseUrlConfig.parse(
+                "postgresql://neondb_owner:secreto@ep-algo-pooler.us-east-2.aws.neon.tech/uber?sslmode=require");
+
+        assertThat(result.jdbcUrl())
+                .isEqualTo("jdbc:postgresql://ep-algo-pooler.us-east-2.aws.neon.tech:5432/uber?sslmode=require");
+        assertThat(result.username()).isEqualTo("neondb_owner");
+        assertThat(result.password()).isEqualTo("secreto");
+    }
+
+    @Test
+    void parse_channelBindingNoSoportadoPorJdbc_loDescarta() {
+        DatabaseUrl result = DatabaseUrlConfig.parse(
+                "postgresql://u:p@host/uber?sslmode=require&channel_binding=require");
+
+        assertThat(result.jdbcUrl()).isEqualTo("jdbc:postgresql://host:5432/uber?sslmode=require");
+    }
+
+    @Test
+    void parse_soloChannelBinding_noDejaInterrogacionSuelta() {
+        DatabaseUrl result = DatabaseUrlConfig.parse("postgresql://u:p@host/uber?channel_binding=require");
+
+        assertThat(result.jdbcUrl()).isEqualTo("jdbc:postgresql://host:5432/uber");
+    }
 }
