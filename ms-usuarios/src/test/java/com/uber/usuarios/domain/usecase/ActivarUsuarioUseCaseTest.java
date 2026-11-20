@@ -50,6 +50,15 @@ class ActivarUsuarioUseCaseTest {
     }
 
     @Test
+    void activar_usuarioSuspendido_loReactiva() {
+        Usuario u = Usuario.builder().id(3L).estado(EstadoUsuario.SUSPENDIDO).build();
+        when(usuarioGateway.buscarPorId(3L)).thenReturn(Optional.of(u));
+        when(usuarioGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThat(useCase.activar(3L).getEstado()).isEqualTo(EstadoUsuario.ACTIVO);
+    }
+
+    @Test
     void activar_usuarioYaActivo_lanzaExcepcion() {
         Usuario u = Usuario.builder().id(1L).estado(EstadoUsuario.ACTIVO).build();
         when(usuarioGateway.buscarPorId(1L)).thenReturn(Optional.of(u));

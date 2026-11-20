@@ -19,7 +19,8 @@ public class ActivarUsuarioUseCase {
         Usuario usuario = usuarioGateway.buscarPorId(id)
                 .orElseThrow(() -> new UsuarioNoEncontradoException(id));
 
-        if (usuario.getEstado() == EstadoUsuario.PENDIENTE || usuario.getEstado() == EstadoUsuario.INACTIVO) {
+        if (usuario.getEstado() == EstadoUsuario.PENDIENTE || usuario.getEstado() == EstadoUsuario.INACTIVO
+                || usuario.getEstado() == EstadoUsuario.SUSPENDIDO) {
             usuario.setEstado(EstadoUsuario.ACTIVO);
             return usuarioGateway.guardar(usuario);
         }

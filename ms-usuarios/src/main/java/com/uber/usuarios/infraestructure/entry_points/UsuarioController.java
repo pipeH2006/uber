@@ -5,6 +5,8 @@ import com.uber.usuarios.domain.usecase.ActivarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.CalificarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.DesactivarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.LoginUseCase;
+import com.uber.usuarios.domain.usecase.RechazarDocumentoUseCase;
+import com.uber.usuarios.domain.usecase.SuspenderUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.ObtenerCalificacionPromedioUseCase;
 import com.uber.usuarios.domain.usecase.UsuarioCrudUseCase;
 import com.uber.usuarios.domain.usecase.VerificarDocumentoUseCase;
@@ -41,6 +43,8 @@ public class UsuarioController {
     private final ActivarUsuarioUseCase activarUseCase;
     private final DesactivarUsuarioUseCase desactivarUseCase;
     private final VerificarDocumentoUseCase verificarDocumentoUseCase;
+    private final SuspenderUsuarioUseCase suspenderUseCase;
+    private final RechazarDocumentoUseCase rechazarDocumentoUseCase;
     private final CalificarUsuarioUseCase calificarUseCase;
     private final ObtenerCalificacionPromedioUseCase promedioUseCase;
 
@@ -112,6 +116,16 @@ public class UsuarioController {
     @PostMapping("/usuarios/{id}/verificar-documento")
     public ResponseEntity<UsuarioResponse> verificarDocumento(@PathVariable Long id) {
         return ResponseEntity.ok(UsuarioResponse.from(verificarDocumentoUseCase.verificarDocumento(id)));
+    }
+
+    @PostMapping("/usuarios/{id}/suspender")
+    public ResponseEntity<UsuarioResponse> suspender(@PathVariable Long id) {
+        return ResponseEntity.ok(UsuarioResponse.from(suspenderUseCase.suspender(id)));
+    }
+
+    @PostMapping("/usuarios/{id}/rechazar-documento")
+    public ResponseEntity<UsuarioResponse> rechazarDocumento(@PathVariable Long id) {
+        return ResponseEntity.ok(UsuarioResponse.from(rechazarDocumentoUseCase.rechazarDocumento(id)));
     }
 
     @PostMapping("/usuarios/{id}/calificar")

@@ -5,6 +5,8 @@ import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import com.uber.usuarios.domain.usecase.ActivarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.CalificarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.DesactivarUsuarioUseCase;
+import com.uber.usuarios.domain.usecase.RechazarDocumentoUseCase;
+import com.uber.usuarios.domain.usecase.SuspenderUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.LoginUseCase;
 import com.uber.usuarios.domain.usecase.ObtenerCalificacionPromedioUseCase;
 import com.uber.usuarios.domain.usecase.UsuarioCrudUseCase;
@@ -33,6 +35,16 @@ public class UseCaseConfig {
     @Bean
     public ActivarUsuarioUseCase activarUsuarioUseCase(UsuarioGateway usuarioGateway) {
         return new ActivarUsuarioUseCase(usuarioGateway);
+    }
+
+    @Bean
+    public SuspenderUsuarioUseCase suspenderUsuarioUseCase(UsuarioGateway usuarioGateway) {
+        return new SuspenderUsuarioUseCase(usuarioGateway);
+    }
+
+    @Bean
+    public RechazarDocumentoUseCase rechazarDocumentoUseCase(UsuarioGateway usuarioGateway) {
+        return new RechazarDocumentoUseCase(usuarioGateway);
     }
 
     @Bean

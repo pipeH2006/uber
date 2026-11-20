@@ -12,6 +12,8 @@ import com.uber.usuarios.domain.model.EstadoUsuario;
 import com.uber.usuarios.domain.model.Rol;
 import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.usecase.ActivarUsuarioUseCase;
+import com.uber.usuarios.domain.usecase.RechazarDocumentoUseCase;
+import com.uber.usuarios.domain.usecase.SuspenderUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.CalificarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.DesactivarUsuarioUseCase;
 import com.uber.usuarios.domain.usecase.LoginUseCase;
@@ -61,6 +63,12 @@ class UsuarioControllerTest {
 
     @MockBean
     private VerificarDocumentoUseCase verificarDocumentoUseCase;
+
+    @MockBean
+    private SuspenderUsuarioUseCase suspenderUseCase;
+
+    @MockBean
+    private RechazarDocumentoUseCase rechazarDocumentoUseCase;
 
     @MockBean
     private CalificarUsuarioUseCase calificarUseCase;
@@ -276,5 +284,37 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"calificadorId\":2,\"puntaje\":5}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void suspender_devuelve200() throws Exception {
+        when(suspenderUseCase.suspender(1L)).thenReturn(usuario());
+
+        mockMvc.perform(post("/api/v1/usuarios/1/suspender"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void suspender_yaSuspendido_devuelve409() throws Exception {
+        when(suspenderUseCase.suspender(1L)).thenThrow(new EstadoInvalidoException("ya suspendido"));
+
+        mockMvc.perform(post("/api/v1/usuarios/1/suspender"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void rechazarDocumento_devuelve200() throws Exception {
+        when(rechazarDocumentoUseCase.rechazarDocumento(1L)).thenReturn(usuario());
+
+        mockMvc.perform(post("/api/v1/usuarios/1/rechazar-documento"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void rechazarDocumento_noConductor_devuelve422() throws Exception {
+        when(rechazarDocumentoUseCase.rechazarDocumento(1L)).thenThrow(new DocumentoNoVerificableException(1L));
+
+        mockMvc.perform(post("/api/v1/usuarios/1/rechazar-documento"))
+                .andExpect(status().isUnprocessableEntity());
     }
 }
