@@ -31,3 +31,4 @@ externo:
   groq-api-key: ${GROQ_API_KEY:}
   groq-base-url: ${GROQ_BASE_URL:https://api.groq.com/openai}
   notificaciones-url: ${NOTIFICACIONES_URL:}
+  usuarios-url: ${USUARIOS_URL:}

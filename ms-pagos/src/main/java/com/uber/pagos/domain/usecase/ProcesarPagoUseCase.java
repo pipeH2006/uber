@@ -5,6 +5,7 @@ import com.uber.pagos.domain.model.MetodoPago;
 import com.uber.pagos.domain.model.Pago;
 import com.uber.pagos.domain.model.gateway.NotificacionGateway;
 import com.uber.pagos.domain.model.gateway.PagoGateway;
+import com.uber.pagos.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ public class ProcesarPagoUseCase {
 
     private final PagoGateway pagoGateway;
     private final NotificacionGateway notificacionGateway;
+    private final UsuarioGateway usuarioGateway;
 
     public Pago procesar(Long viajeId, Long usuarioId, BigDecimal monto, String moneda, MetodoPago metodoPago) {
         String monedaNormalizada = (moneda == null || moneda.isBlank()) ? "USD" : moneda;
@@ -30,8 +32,8 @@ public class ProcesarPagoUseCase {
                 .referencia("PAG-" + UUID.randomUUID())
                 .build();
         Pago guardado = pagoGateway.guardar(pago);
-        notificacionGateway.notificar("usuario-" + usuarioId,
-                "Pago aprobado por " + monto + " " + monedaNormalizada + " (ref: " + guardado.getReferencia() + ")");
+        usuarioGateway.obtenerChatIdTelegram(usuarioId).ifPresent(chatId -> notificacionGateway.notificar(chatId,
+                "Pago aprobado por " + monto + " " + monedaNormalizada + " (ref: " + guardado.getReferencia() + ")"));
         return guardado;
     }
 }

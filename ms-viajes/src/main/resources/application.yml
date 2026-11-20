@@ -30,3 +30,4 @@ externo:
   osrm-base-url: ${OSRM_BASE_URL:https://router.project-osrm.org}
   dolar-base-url: ${DOLAR_BASE_URL:https://open.er-api.com}
   notificaciones-url: ${NOTIFICACIONES_URL:}
+  usuarios-url: ${USUARIOS_URL:}

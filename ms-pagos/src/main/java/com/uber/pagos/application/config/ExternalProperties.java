@@ -7,7 +7,8 @@ public record ExternalProperties(
         String dolarBaseUrl,
         String groqApiKey,
         String groqBaseUrl,
-        String notificacionesUrl
+        String notificacionesUrl,
+        String usuariosUrl
 ) {
 
     public ExternalProperties {
@@ -22,6 +23,9 @@ public record ExternalProperties(
         }
         if (notificacionesUrl == null) {
             notificacionesUrl = "";
+        }
+        if (usuariosUrl == null) {
+            usuariosUrl = "";
         }
     }
 }

@@ -72,6 +72,7 @@ public class UsuarioController {
                 .nombre(request.nombre())
                 .email(request.email())
                 .telefono(request.telefono())
+                .telegramChatId(request.telegramChatId())
                 .rol(request.rol())
                 .build();
         return ResponseEntity.ok(UsuarioResponse.from(crudUseCase.actualizar(id, datos)));
@@ -124,6 +125,7 @@ public class UsuarioController {
                 .nombre(r.nombre())
                 .email(r.email())
                 .telefono(r.telefono())
+                .telegramChatId(r.telegramChatId())
                 .contrasenaHash(r.contrasena())
                 .rol(r.rol())
                 .build();

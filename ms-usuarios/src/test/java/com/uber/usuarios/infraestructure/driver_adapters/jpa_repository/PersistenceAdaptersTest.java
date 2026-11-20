@@ -33,6 +33,7 @@ class PersistenceAdaptersTest {
                 .nombre("Ana")
                 .email("ana@correo.com")
                 .telefono("3001234567")
+                .telegramChatId("123456789")
                 .contrasenaHash("hash")
                 .rol(Rol.CONDUCTOR)
                 .estado(EstadoUsuario.ACTIVO)
@@ -50,6 +51,7 @@ class PersistenceAdaptersTest {
         assertThat(encontrado).isPresent();
         assertThat(encontrado.get().getEmail()).isEqualTo("ana@correo.com");
         assertThat(encontrado.get().getRol()).isEqualTo(Rol.CONDUCTOR);
+        assertThat(encontrado.get().getTelegramChatId()).isEqualTo("123456789");
     }
 
     @Test

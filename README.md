@@ -243,6 +243,7 @@ Ver `.env.example`. Las más importantes:
 | `GROQ_API_KEY` | pagos | Clave de Groq (gratis) |
 | `TELEGRAM_BOT_TOKEN` | notificaciones | Token del bot de Telegram |
 | `NOTIFICACIONES_URL` | viajes, pagos | URL de `ms-notificaciones` (para notificar eventos) |
+| `USUARIOS_URL` | viajes, pagos | URL de `ms-usuarios` (para resolver el `telegramChatId` del destinatario) |
 
 ---
 
@@ -296,6 +297,7 @@ Repite estos pasos para **cada** microservicio:
 5. **Deploy** y verifica en `https://tu-servicio.onrender.com/actuator/health`.
 
 > Para conectar `ms-viajes`/`ms-pagos` con `ms-notificaciones`, pon `NOTIFICACIONES_URL = https://tu-ms-notificaciones.onrender.com`.
+> Para que esas notificaciones lleguen a Telegram, pon tambien `USUARIOS_URL = https://tu-ms-usuarios.onrender.com`: viajes y pagos consultan el `telegramChatId` del usuario ahi. Si el usuario no lo tiene registrado (o `USUARIOS_URL` esta vacia), la notificacion se omite con un `warn`, sin afectar la operacion.
 
 ---
 

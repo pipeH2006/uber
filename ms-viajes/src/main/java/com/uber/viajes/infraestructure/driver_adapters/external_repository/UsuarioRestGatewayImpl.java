@@ -1,0 +1,43 @@
+package com.uber.viajes.infraestructure.driver_adapters.external_repository;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestClient;
+
+import java.util.Optional;
+
+@Slf4j
+public class UsuarioRestGatewayImpl implements UsuarioGateway {
+
+    private final RestClient restClient;
+    private final String usuariosUrl;
+
+    public UsuarioRestGatewayImpl(RestClient restClient, String usuariosUrl) {
+        this.restClient = restClient;
+        this.usuariosUrl = usuariosUrl;
+    }
+
+    @Override
+    public Optional<String> obtenerChatIdTelegram(Long usuarioId) {
+        if (usuariosUrl == null || usuariosUrl.isBlank()) {
+            log.warn("URL de usuarios no configurada; no se puede resolver el chat de Telegram del usuario {}", usuarioId);
+            return Optional.empty();
+        }
+        try {
+            JsonNode usuario = restClient.get()
+                    .uri("/api/v1/usuarios/{id}", usuarioId)
+                    .retrieve()
+                    .body(JsonNode.class);
+            String chatId = usuario == null ? "" : usuario.path("telegramChatId").asText("");
+            if (chatId.isBlank()) {
+                log.warn("El usuario {} no tiene chat de Telegram registrado; se omite la notificacion", usuarioId);
+                return Optional.empty();
+            }
+            return Optional.of(chatId);
+        } catch (Exception e) {
+            log.warn("No se pudo consultar el usuario {} en ms-usuarios: {}", usuarioId, e.getMessage());
+            return Optional.empty();
+        }
+    }
+}

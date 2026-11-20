@@ -5,6 +5,7 @@ import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
 import com.uber.viajes.domain.model.Viaje;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ public class SolicitarViajeUseCase {
     private final EstimarViajeUseCase estimarViajeUseCase;
     private final NotificacionGateway notificacionGateway;
     private final ViajeGateway viajeGateway;
+    private final UsuarioGateway usuarioGateway;
 
     public Viaje solicitar(Long pasajeroId, Long conductorId, Coordenada origen, Coordenada destino) {
         // La estimación (ruta + tarifa USD/COP) se obtiene a través del caso de uso de estimación,
@@ -38,7 +40,8 @@ public class SolicitarViajeUseCase {
                 .build();
 
         Viaje guardado = viajeGateway.guardar(viaje);
-        notificacionGateway.notificar("conductor-" + conductorId, "Se te ha asignado un nuevo viaje");
+        usuarioGateway.obtenerChatIdTelegram(conductorId)
+                .ifPresent(chatId -> notificacionGateway.notificar(chatId, "Se te ha asignado un nuevo viaje"));
         return guardado;
     }
 }

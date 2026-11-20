@@ -47,6 +47,7 @@ export default function App() {
       telefono: form.get('telefono'),
       contrasena: form.get('contrasena'),
       rol: form.get('rol'),
+      telegramChatId: form.get('telegramChatId') || null,
     };
     setLoading(true);
     setError('');
@@ -275,6 +276,12 @@ export default function App() {
               <input name="nombre" placeholder="Nombre" required />
               <input name="email" type="email" placeholder="Email" required />
               <input name="telefono" placeholder="Teléfono" />
+              <input
+                name="telegramChatId"
+                placeholder="Chat ID de Telegram (para recibir avisos)"
+                inputMode="numeric"
+                pattern="-?[0-9]{1,20}"
+              />
               <input name="contrasena" type="password" placeholder="Contraseña (min 6)" required minLength={6} />
               <button type="submit" disabled={loading}>
                 Registrar

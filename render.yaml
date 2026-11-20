@@ -38,6 +38,8 @@ services:
         value: "https://router.project-osrm.org"
       - key: NOTIFICACIONES_URL
         value: "https://uber-ms-notificaciones.onrender.com"
+      - key: USUARIOS_URL
+        value: "https://uber-ms-usuarios.onrender.com"
 
   - type: web
     name: uber-ms-pagos
@@ -55,6 +57,8 @@ services:
         sync: false
       - key: NOTIFICACIONES_URL
         value: "https://uber-ms-notificaciones.onrender.com"
+      - key: USUARIOS_URL
+        value: "https://uber-ms-usuarios.onrender.com"
 
   - type: web
     name: uber-ms-notificaciones

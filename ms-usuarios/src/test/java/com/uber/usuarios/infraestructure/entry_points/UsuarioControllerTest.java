@@ -74,6 +74,7 @@ class UsuarioControllerTest {
                 .nombre("Ana")
                 .email("ana@correo.com")
                 .telefono("3001234567")
+                .telegramChatId("123456789")
                 .rol(Rol.CONDUCTOR)
                 .estado(EstadoUsuario.ACTIVO)
                 .estadoDocumento(EstadoDocumento.VERIFICADO)
@@ -87,9 +88,19 @@ class UsuarioControllerTest {
         mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistroUsuarioRequest(
-                                "Ana", "ana@correo.com", "3001234567", "secreto", Rol.CONDUCTOR))))
+                                "Ana", "ana@correo.com", "3001234567", "secreto", Rol.CONDUCTOR, "123456789"))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value("ana@correo.com"));
+                .andExpect(jsonPath("$.email").value("ana@correo.com"))
+                .andExpect(jsonPath("$.telegramChatId").value("123456789"));
+    }
+
+    @Test
+    void registrar_chatIdNoNumerico_devuelve400() throws Exception {
+        mockMvc.perform(post("/api/v1/usuarios")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RegistroUsuarioRequest(
+                                "Ana", "ana@correo.com", "3001234567", "secreto", Rol.PASAJERO, "abc"))))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -243,7 +254,7 @@ class UsuarioControllerTest {
         mockMvc.perform(post("/api/v1/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistroUsuarioRequest(
-                                "Ana", "ana@correo.com", "3001234567", "secreto", Rol.PASAJERO))))
+                                "Ana", "ana@correo.com", "3001234567", "secreto", Rol.PASAJERO, null))))
                 .andExpect(status().isConflict());
     }
 

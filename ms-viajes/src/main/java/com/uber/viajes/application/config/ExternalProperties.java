@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record ExternalProperties(
         String osrmBaseUrl,
         String dolarBaseUrl,
-        String notificacionesUrl
+        String notificacionesUrl,
+        String usuariosUrl
 ) {
 
     public ExternalProperties {
@@ -18,6 +19,9 @@ public record ExternalProperties(
         }
         if (notificacionesUrl == null) {
             notificacionesUrl = "";
+        }
+        if (usuariosUrl == null) {
+            usuariosUrl = "";
         }
     }
 }

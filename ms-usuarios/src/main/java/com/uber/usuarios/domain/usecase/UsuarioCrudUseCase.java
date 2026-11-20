@@ -53,6 +53,9 @@ public class UsuarioCrudUseCase {
         if (datos.getTelefono() != null) {
             existente.setTelefono(datos.getTelefono());
         }
+        if (datos.getTelegramChatId() != null) {
+            existente.setTelegramChatId(datos.getTelegramChatId());
+        }
         if (datos.getEmail() != null && !datos.getEmail().equals(existente.getEmail())) {
             if (usuarioGateway.existePorEmail(datos.getEmail())) {
                 throw new EmailYaRegistradoException(datos.getEmail());

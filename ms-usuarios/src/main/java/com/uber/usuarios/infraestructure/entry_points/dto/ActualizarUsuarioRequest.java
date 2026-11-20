@@ -2,6 +2,7 @@ package com.uber.usuarios.infraestructure.entry_points.dto;
 
 import com.uber.usuarios.domain.model.Rol;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record ActualizarUsuarioRequest(
@@ -14,6 +15,9 @@ public record ActualizarUsuarioRequest(
         @Size(max = 20)
         String telefono,
 
-        Rol rol
+        Rol rol,
+
+        @Pattern(regexp = "^-?\\d{1,20}$", message = "El chat ID de Telegram debe ser numérico")
+        String telegramChatId
 ) {
 }

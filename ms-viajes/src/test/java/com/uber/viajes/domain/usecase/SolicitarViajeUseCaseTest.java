@@ -5,6 +5,7 @@ import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
 import com.uber.viajes.domain.model.Viaje;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,11 +34,14 @@ class SolicitarViajeUseCaseTest {
     @Mock
     private ViajeGateway viajeGateway;
 
+    @Mock
+    private UsuarioGateway usuarioGateway;
+
     private SolicitarViajeUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway);
+        useCase = new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway, usuarioGateway);
     }
 
     @Test
@@ -45,6 +51,7 @@ class SolicitarViajeUseCaseTest {
         when(estimarViajeUseCase.estimar(origen, destino)).thenReturn(new Estimacion(
                 10.0, 20.0, new BigDecimal("13.50"), new BigDecimal("54000.00"), new BigDecimal("4000")));
         when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(2L)).thenReturn(Optional.of("555"));
 
         Viaje viaje = useCase.solicitar(1L, 2L, origen, destino);
 
@@ -59,6 +66,21 @@ class SolicitarViajeUseCaseTest {
         assertThat(viaje.getMoneda()).isEqualTo("USD");
         assertThat(viaje.getFechaSolicitud()).isNotNull();
 
-        verify(notificacionGateway).notificar("conductor-2", "Se te ha asignado un nuevo viaje");
+        verify(notificacionGateway).notificar("555", "Se te ha asignado un nuevo viaje");
+    }
+
+    @Test
+    void solicitar_conductorSinChat_creaViajeSinNotificar() {
+        Coordenada origen = new Coordenada(4.71, -74.07);
+        Coordenada destino = new Coordenada(4.60, -74.08);
+        when(estimarViajeUseCase.estimar(origen, destino)).thenReturn(new Estimacion(
+                10.0, 20.0, new BigDecimal("13.50"), new BigDecimal("54000.00"), new BigDecimal("4000")));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(2L)).thenReturn(Optional.empty());
+
+        Viaje viaje = useCase.solicitar(1L, 2L, origen, destino);
+
+        assertThat(viaje.getEstado()).isEqualTo(EstadoViaje.ASIGNADO);
+        verifyNoInteractions(notificacionGateway);
     }
 }

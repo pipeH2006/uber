@@ -40,6 +40,9 @@ public class UsuarioData {
 
     private String telefono;
 
+    @Column(name = "telegram_chat_id", length = 30)
+    private String telegramChatId;
+
     @Column(name = "contrasena_hash", nullable = false)
     private String contrasenaHash;
 

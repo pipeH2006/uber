@@ -3,6 +3,7 @@ package com.uber.viajes.application.config;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
 import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import com.uber.viajes.domain.usecase.CancelarViajeUseCase;
 import com.uber.viajes.domain.usecase.EstimarViajeUseCase;
@@ -35,8 +36,9 @@ public class UseCaseConfig {
     @Bean
     public SolicitarViajeUseCase solicitarViajeUseCase(EstimarViajeUseCase estimarViajeUseCase,
                                                        NotificacionGateway notificacionGateway,
-                                                       ViajeGateway viajeGateway) {
-        return new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway);
+                                                       ViajeGateway viajeGateway,
+                                                       UsuarioGateway usuarioGateway) {
+        return new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway, usuarioGateway);
     }
 
     @Bean
@@ -46,8 +48,9 @@ public class UseCaseConfig {
 
     @Bean
     public FinalizarViajeUseCase finalizarViajeUseCase(ViajeGateway viajeGateway,
-                                                       NotificacionGateway notificacionGateway) {
-        return new FinalizarViajeUseCase(viajeGateway, notificacionGateway);
+                                                       NotificacionGateway notificacionGateway,
+                                                       UsuarioGateway usuarioGateway) {
+        return new FinalizarViajeUseCase(viajeGateway, notificacionGateway, usuarioGateway);
     }
 
     @Bean

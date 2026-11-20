@@ -4,6 +4,7 @@ import com.uber.pagos.domain.model.gateway.FraudeGateway;
 import com.uber.pagos.domain.model.gateway.NotificacionGateway;
 import com.uber.pagos.domain.model.gateway.PagoGateway;
 import com.uber.pagos.domain.model.gateway.TipoCambioGateway;
+import com.uber.pagos.domain.model.gateway.UsuarioGateway;
 import com.uber.pagos.domain.usecase.ConsultarTipoCambioUseCase;
 import com.uber.pagos.domain.usecase.EvaluarFraudeUseCase;
 import com.uber.pagos.domain.usecase.GenerarFacturaUseCase;
@@ -28,8 +29,9 @@ public class UseCaseConfig {
 
     @Bean
     public ProcesarPagoUseCase procesarPagoUseCase(PagoGateway pagoGateway,
-                                                   NotificacionGateway notificacionGateway) {
-        return new ProcesarPagoUseCase(pagoGateway, notificacionGateway);
+                                                   NotificacionGateway notificacionGateway,
+                                                   UsuarioGateway usuarioGateway) {
+        return new ProcesarPagoUseCase(pagoGateway, notificacionGateway, usuarioGateway);
     }
 
     @Bean

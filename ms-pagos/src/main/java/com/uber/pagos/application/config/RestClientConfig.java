@@ -3,10 +3,12 @@ package com.uber.pagos.application.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uber.pagos.domain.model.gateway.FraudeGateway;
 import com.uber.pagos.domain.model.gateway.NotificacionGateway;
+import com.uber.pagos.domain.model.gateway.UsuarioGateway;
 import com.uber.pagos.domain.model.gateway.TipoCambioGateway;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.DolarApiGatewayImpl;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.GroqFraudeGatewayImpl;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.NotificacionRestGatewayImpl;
+import com.uber.pagos.infraestructure.driver_adapters.external_repository.UsuarioRestGatewayImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +66,20 @@ public class RestClientConfig {
     @Bean
     public NotificacionGateway notificacionGateway(RestClient notificacionesRestClient, ExternalProperties props) {
         return new NotificacionRestGatewayImpl(notificacionesRestClient, props.notificacionesUrl());
+    }
+
+    @Bean
+    public RestClient usuariosRestClient(ExternalProperties props) {
+        String base = props.usuariosUrl().isBlank() ? "http://localhost:8080" : props.usuariosUrl();
+        return RestClient.builder()
+                .baseUrl(base)
+                .requestFactory(clientHttpRequestFactory())
+                .build();
+    }
+
+    @Bean
+    public UsuarioGateway usuarioGateway(RestClient usuariosRestClient, ExternalProperties props) {
+        return new UsuarioRestGatewayImpl(usuariosRestClient, props.usuariosUrl());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {

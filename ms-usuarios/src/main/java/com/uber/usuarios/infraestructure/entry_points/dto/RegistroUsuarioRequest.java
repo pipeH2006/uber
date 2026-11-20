@@ -4,6 +4,7 @@ import com.uber.usuarios.domain.model.Rol;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegistroUsuarioRequest(
@@ -23,6 +24,9 @@ public record RegistroUsuarioRequest(
         String contrasena,
 
         @NotNull(message = "El rol es obligatorio")
-        Rol rol
+        Rol rol,
+
+        @Pattern(regexp = "^-?\\d{1,20}$", message = "El chat ID de Telegram debe ser numérico")
+        String telegramChatId
 ) {
 }

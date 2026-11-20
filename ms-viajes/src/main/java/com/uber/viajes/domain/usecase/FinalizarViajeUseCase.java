@@ -5,6 +5,7 @@ import com.uber.viajes.domain.exception.ViajeNoEncontradoException;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Viaje;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,7 @@ public class FinalizarViajeUseCase {
 
     private final ViajeGateway viajeGateway;
     private final NotificacionGateway notificacionGateway;
+    private final UsuarioGateway usuarioGateway;
 
     public Viaje finalizar(Long id) {
         Viaje viaje = viajeGateway.buscarPorId(id)
@@ -27,7 +29,8 @@ public class FinalizarViajeUseCase {
         viaje.setCostoFinal(viaje.getCostoEstimado());
         viaje.setFechaFin(LocalDateTime.now());
         Viaje guardado = viajeGateway.guardar(viaje);
-        notificacionGateway.notificar("pasajero-" + viaje.getPasajeroId(), "Tu viaje ha finalizado");
+        usuarioGateway.obtenerChatIdTelegram(viaje.getPasajeroId())
+                .ifPresent(chatId -> notificacionGateway.notificar(chatId, "Tu viaje ha finalizado"));
         return guardado;
     }
 }

@@ -117,6 +117,17 @@ class UsuarioCrudUseCaseTest {
     }
 
     @Test
+    void actualizar_conChatIdTelegram_loGuarda() {
+        Usuario existente = Usuario.builder().id(1L).nombre("Ana").email("ana@correo.com").build();
+        when(usuarioGateway.buscarPorId(1L)).thenReturn(Optional.of(existente));
+        when(usuarioGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Usuario resultado = useCase.actualizar(1L, Usuario.builder().telegramChatId("987654321").build());
+
+        assertThat(resultado.getTelegramChatId()).isEqualTo("987654321");
+    }
+
+    @Test
     void actualizar_emailDuplicado_lanzaExcepcion() {
         Usuario existente = Usuario.builder().id(1L).nombre("Ana").email("ana@correo.com").build();
         when(usuarioGateway.buscarPorId(1L)).thenReturn(Optional.of(existente));

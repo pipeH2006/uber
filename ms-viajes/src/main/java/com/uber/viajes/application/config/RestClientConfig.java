@@ -1,10 +1,12 @@
 package com.uber.viajes.application.config;
 
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.DolarApiGatewayImpl;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.NotificacionRestGatewayImpl;
+import com.uber.viajes.infraestructure.driver_adapters.external_repository.UsuarioRestGatewayImpl;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.OsrmGatewayImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -61,6 +63,20 @@ public class RestClientConfig {
     @Bean
     public NotificacionGateway notificacionGateway(RestClient notificacionesRestClient, ExternalProperties props) {
         return new NotificacionRestGatewayImpl(notificacionesRestClient, props.notificacionesUrl());
+    }
+
+    @Bean
+    public RestClient usuariosRestClient(ExternalProperties props) {
+        String base = props.usuariosUrl().isBlank() ? "http://localhost:8080" : props.usuariosUrl();
+        return RestClient.builder()
+                .baseUrl(base)
+                .requestFactory(clientHttpRequestFactory())
+                .build();
+    }
+
+    @Bean
+    public UsuarioGateway usuarioGateway(RestClient usuariosRestClient, ExternalProperties props) {
+        return new UsuarioRestGatewayImpl(usuariosRestClient, props.usuariosUrl());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
