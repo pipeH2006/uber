@@ -1,5 +1,6 @@
 package com.uber.pagos.domain.usecase;
 
+import com.uber.pagos.domain.exception.UsuarioNoEncontradoException;
 import com.uber.pagos.domain.model.EstadoPago;
 import com.uber.pagos.domain.model.MetodoPago;
 import com.uber.pagos.domain.model.Pago;
@@ -16,9 +17,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -40,6 +43,7 @@ class ProcesarPagoUseCaseTest {
     @BeforeEach
     void setUp() {
         useCase = new ProcesarPagoUseCase(pagoGateway, notificacionGateway, usuarioGateway);
+        lenient().when(usuarioGateway.usuarioExiste(any())).thenReturn(true);
     }
 
     @Test
@@ -92,5 +96,15 @@ class ProcesarPagoUseCaseTest {
         Pago resultado = useCase.procesar(1L, 2L, new BigDecimal("100.50"), "COP", MetodoPago.BILLETERA);
 
         assertThat(resultado.getMoneda()).isEqualTo("COP");
+    }
+
+    @Test
+    void procesar_usuarioInexistente_lanzaExcepcionSinGuardar() {
+        when(usuarioGateway.usuarioExiste(2L)).thenReturn(false);
+
+        assertThatThrownBy(() -> useCase.procesar(1L, 2L, new BigDecimal("100.50"), "USD", MetodoPago.TARJETA))
+                .isInstanceOf(UsuarioNoEncontradoException.class);
+
+        verifyNoInteractions(pagoGateway, notificacionGateway);
     }
 }

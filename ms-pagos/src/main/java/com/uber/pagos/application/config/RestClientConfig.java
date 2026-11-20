@@ -8,7 +8,7 @@ import com.uber.pagos.domain.model.gateway.TipoCambioGateway;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.DolarApiGatewayImpl;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.GroqFraudeGatewayImpl;
 import com.uber.pagos.infraestructure.driver_adapters.external_repository.NotificacionRestGatewayImpl;
-import com.uber.pagos.infraestructure.driver_adapters.external_repository.UsuarioRestGatewayImpl;
+import com.uber.pagos.infraestructure.driver_adapters.external_repository.UsuarioGatewayImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,7 +79,7 @@ public class RestClientConfig {
 
     @Bean
     public UsuarioGateway usuarioGateway(RestClient usuariosRestClient, ExternalProperties props) {
-        return new UsuarioRestGatewayImpl(usuariosRestClient, props.usuariosUrl());
+        return new UsuarioGatewayImpl(usuariosRestClient, props.usuariosUrl());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {

@@ -1,6 +1,7 @@
 package com.uber.viajes.infraestructure.entry_points;
 
 import com.uber.viajes.domain.exception.ErrorExternoException;
+import com.uber.viajes.domain.exception.UsuarioNoEncontradoException;
 import com.uber.viajes.domain.exception.EstadoViajeInvalidoException;
 import com.uber.viajes.domain.exception.ViajeNoEncontradoException;
 import com.uber.viajes.infraestructure.entry_points.dto.ApiError;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EstadoViajeInvalidoException.class)
     public ResponseEntity<ApiError> handleEstadoInvalido(EstadoViajeInvalidoException ex, HttpServletRequest req) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(UsuarioNoEncontradoException.class)
+    public ResponseEntity<ApiError> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
     @ExceptionHandler(ErrorExternoException.class)

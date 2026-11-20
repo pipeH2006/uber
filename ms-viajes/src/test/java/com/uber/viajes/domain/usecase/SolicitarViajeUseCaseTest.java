@@ -1,5 +1,6 @@
 package com.uber.viajes.domain.usecase;
 
+import com.uber.viajes.domain.exception.UsuarioNoEncontradoException;
 import com.uber.viajes.domain.model.Coordenada;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
@@ -17,7 +18,9 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -42,6 +45,7 @@ class SolicitarViajeUseCaseTest {
     @BeforeEach
     void setUp() {
         useCase = new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway, usuarioGateway);
+        lenient().when(usuarioGateway.usuarioExiste(any())).thenReturn(true);
     }
 
     @Test
@@ -82,5 +86,27 @@ class SolicitarViajeUseCaseTest {
 
         assertThat(viaje.getEstado()).isEqualTo(EstadoViaje.ASIGNADO);
         verifyNoInteractions(notificacionGateway);
+    }
+
+    @Test
+    void solicitar_pasajeroInexistente_lanzaExcepcionSinCrearViaje() {
+        when(usuarioGateway.usuarioExiste(1L)).thenReturn(false);
+
+        assertThatThrownBy(() -> useCase.solicitar(1L, 2L, new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
+                .isInstanceOf(UsuarioNoEncontradoException.class)
+                .hasMessageContaining("1");
+
+        verifyNoInteractions(estimarViajeUseCase, viajeGateway, notificacionGateway);
+    }
+
+    @Test
+    void solicitar_conductorInexistente_lanzaExcepcionSinCrearViaje() {
+        when(usuarioGateway.usuarioExiste(2L)).thenReturn(false);
+
+        assertThatThrownBy(() -> useCase.solicitar(1L, 2L, new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
+                .isInstanceOf(UsuarioNoEncontradoException.class)
+                .hasMessageContaining("2");
+
+        verifyNoInteractions(estimarViajeUseCase, viajeGateway, notificacionGateway);
     }
 }

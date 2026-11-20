@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uber.pagos.domain.exception.ErrorExternoException;
 import com.uber.pagos.domain.exception.EstadoPagoInvalidoException;
 import com.uber.pagos.domain.exception.PagoNoEncontradoException;
+import com.uber.pagos.domain.exception.UsuarioNoEncontradoException;
 import com.uber.pagos.domain.model.EstadoPago;
 import com.uber.pagos.domain.model.Factura;
 import com.uber.pagos.domain.model.MetodoPago;
@@ -164,6 +165,18 @@ class PagoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.estado").value("APROBADO"));
+    }
+
+    @Test
+    void procesar_usuarioInexistente_devuelve404() throws Exception {
+        when(procesarUseCase.procesar(eq(10L), eq(2L), any(), eq("USD"), eq(MetodoPago.TARJETA)))
+                .thenThrow(new UsuarioNoEncontradoException(2L));
+
+        mockMvc.perform(post("/api/v1/pagos/procesar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new ProcesarPagoRequest(
+                                10L, 2L, new BigDecimal("100.50"), "USD", MetodoPago.TARJETA))))
+                .andExpect(status().isNotFound());
     }
 
     @Test

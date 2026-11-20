@@ -1,5 +1,6 @@
 package com.uber.pagos.domain.usecase;
 
+import com.uber.pagos.domain.exception.UsuarioNoEncontradoException;
 import com.uber.pagos.domain.model.EstadoPago;
 import com.uber.pagos.domain.model.MetodoPago;
 import com.uber.pagos.domain.model.Pago;
@@ -20,6 +21,9 @@ public class ProcesarPagoUseCase {
     private final UsuarioGateway usuarioGateway;
 
     public Pago procesar(Long viajeId, Long usuarioId, BigDecimal monto, String moneda, MetodoPago metodoPago) {
+        if (!usuarioGateway.usuarioExiste(usuarioId)) {
+            throw new UsuarioNoEncontradoException(usuarioId);
+        }
         String monedaNormalizada = (moneda == null || moneda.isBlank()) ? "USD" : moneda;
         Pago pago = Pago.builder()
                 .viajeId(viajeId)

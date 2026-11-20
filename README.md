@@ -297,6 +297,7 @@ Repite estos pasos para **cada** microservicio:
 5. **Deploy** y verifica en `https://tu-servicio.onrender.com/actuator/health`.
 
 > Para conectar `ms-viajes`/`ms-pagos` con `ms-notificaciones`, pon `NOTIFICACIONES_URL = https://tu-ms-notificaciones.onrender.com`.
+> Con `USUARIOS_URL` configurada, `POST /viajes/solicitar` valida que pasajero y conductor existan y `POST /pagos/procesar` valida el usuario: si no existe responden **404**. Si `ms-usuarios` falla responden **502**. Sin `USUARIOS_URL` la validación se omite (modo simulación).
 > Para que esas notificaciones lleguen a Telegram, pon tambien `USUARIOS_URL = https://tu-ms-usuarios.onrender.com`: viajes y pagos consultan el `telegramChatId` del usuario ahi. Si el usuario no lo tiene registrado (o `USUARIOS_URL` esta vacia), la notificacion se omite con un `warn`, sin afectar la operacion.
 
 ---

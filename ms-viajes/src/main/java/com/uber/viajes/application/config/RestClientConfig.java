@@ -6,7 +6,7 @@ import com.uber.viajes.domain.model.gateway.RutasGateway;
 import com.uber.viajes.domain.model.gateway.TipoCambioGateway;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.DolarApiGatewayImpl;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.NotificacionRestGatewayImpl;
-import com.uber.viajes.infraestructure.driver_adapters.external_repository.UsuarioRestGatewayImpl;
+import com.uber.viajes.infraestructure.driver_adapters.external_repository.UsuarioGatewayImpl;
 import com.uber.viajes.infraestructure.driver_adapters.external_repository.OsrmGatewayImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -76,7 +76,7 @@ public class RestClientConfig {
 
     @Bean
     public UsuarioGateway usuarioGateway(RestClient usuariosRestClient, ExternalProperties props) {
-        return new UsuarioRestGatewayImpl(usuariosRestClient, props.usuariosUrl());
+        return new UsuarioGatewayImpl(usuariosRestClient, props.usuariosUrl());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {

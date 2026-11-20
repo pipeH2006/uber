@@ -1,5 +1,6 @@
-package com.uber.pagos.infraestructure.driver_adapters.external_repository;
+package com.uber.viajes.infraestructure.driver_adapters.external_repository;
 
+import com.uber.viajes.domain.exception.ErrorExternoException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -11,18 +12,19 @@ import org.springframework.web.client.RestClient;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class UsuarioRestGatewayImplTest {
+class UsuarioGatewayImplTest {
 
     private MockWebServer mockWebServer;
-    private UsuarioRestGatewayImpl gateway;
+    private UsuarioGatewayImpl gateway;
 
     @BeforeEach
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         String url = mockWebServer.url("/").toString();
-        gateway = new UsuarioRestGatewayImpl(RestClient.builder().baseUrl(url).build(), url);
+        gateway = new UsuarioGatewayImpl(RestClient.builder().baseUrl(url).build(), url);
     }
 
     @AfterEach
@@ -34,6 +36,51 @@ class UsuarioRestGatewayImplTest {
         return new MockResponse().setHeader("Content-Type", "application/json").setBody(body);
     }
 
+    // ---- usuarioExiste ----
+
+    @Test
+    void usuarioExiste_respuesta200_devuelveTrue() throws Exception {
+        mockWebServer.enqueue(json("{\"id\":7}"));
+
+        assertThat(gateway.usuarioExiste(7L)).isTrue();
+
+        RecordedRequest request = mockWebServer.takeRequest();
+        assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getPath()).isEqualTo("/api/v1/usuarios/7");
+    }
+
+    @Test
+    void usuarioExiste_respuesta404_devuelveFalse() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
+
+        assertThat(gateway.usuarioExiste(99L)).isFalse();
+    }
+
+    @Test
+    void usuarioExiste_errorServidor_lanzaErrorExterno() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        assertThatThrownBy(() -> gateway.usuarioExiste(7L)).isInstanceOf(ErrorExternoException.class);
+    }
+
+    @Test
+    void usuarioExiste_urlVacia_omiteValidacion() {
+        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), "");
+
+        assertThat(sinUrl.usuarioExiste(7L)).isTrue();
+        assertThat(mockWebServer.getRequestCount()).isZero();
+    }
+
+    @Test
+    void usuarioExiste_urlNula_omiteValidacion() {
+        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), null);
+
+        assertThat(sinUrl.usuarioExiste(7L)).isTrue();
+        assertThat(mockWebServer.getRequestCount()).isZero();
+    }
+
+    // ---- obtenerChatIdTelegram ----
+
     @Test
     void obtenerChatIdTelegram_usuarioConChat_devuelveChatId() throws Exception {
         mockWebServer.enqueue(json("{\"id\":7,\"telegramChatId\":\"123456789\"}"));
@@ -41,7 +88,6 @@ class UsuarioRestGatewayImplTest {
         assertThat(gateway.obtenerChatIdTelegram(7L)).contains("123456789");
 
         RecordedRequest request = mockWebServer.takeRequest();
-        assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo("/api/v1/usuarios/7");
     }
 
@@ -75,7 +121,7 @@ class UsuarioRestGatewayImplTest {
 
     @Test
     void obtenerChatIdTelegram_urlVacia_noRealizaLlamada() {
-        UsuarioRestGatewayImpl sinUrl = new UsuarioRestGatewayImpl(RestClient.builder().build(), "");
+        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), "");
 
         assertThat(sinUrl.obtenerChatIdTelegram(7L)).isEmpty();
         assertThat(mockWebServer.getRequestCount()).isZero();
@@ -83,7 +129,7 @@ class UsuarioRestGatewayImplTest {
 
     @Test
     void obtenerChatIdTelegram_urlNula_noRealizaLlamada() {
-        UsuarioRestGatewayImpl sinUrl = new UsuarioRestGatewayImpl(RestClient.builder().build(), null);
+        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), null);
 
         assertThat(sinUrl.obtenerChatIdTelegram(7L)).isEmpty();
         assertThat(mockWebServer.getRequestCount()).isZero();

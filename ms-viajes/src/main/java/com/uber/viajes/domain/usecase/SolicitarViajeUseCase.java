@@ -1,5 +1,6 @@
 package com.uber.viajes.domain.usecase;
 
+import com.uber.viajes.domain.exception.UsuarioNoEncontradoException;
 import com.uber.viajes.domain.model.Coordenada;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
@@ -20,6 +21,9 @@ public class SolicitarViajeUseCase {
     private final UsuarioGateway usuarioGateway;
 
     public Viaje solicitar(Long pasajeroId, Long conductorId, Coordenada origen, Coordenada destino) {
+        validarUsuarioExiste(pasajeroId);
+        validarUsuarioExiste(conductorId);
+
         // La estimación (ruta + tarifa USD/COP) se obtiene a través del caso de uso de estimación,
         // que a su vez invoca RutasGateway.calcularRuta y TipoCambioGateway.obtenerTipoCambio("COP").
         Estimacion estimacion = estimarViajeUseCase.estimar(origen, destino);
@@ -43,5 +47,11 @@ public class SolicitarViajeUseCase {
         usuarioGateway.obtenerChatIdTelegram(conductorId)
                 .ifPresent(chatId -> notificacionGateway.notificar(chatId, "Se te ha asignado un nuevo viaje"));
         return guardado;
+    }
+
+    private void validarUsuarioExiste(Long usuarioId) {
+        if (!usuarioGateway.usuarioExiste(usuarioId)) {
+            throw new UsuarioNoEncontradoException(usuarioId);
+        }
     }
 }

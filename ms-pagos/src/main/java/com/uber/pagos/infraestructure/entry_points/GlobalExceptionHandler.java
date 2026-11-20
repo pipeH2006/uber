@@ -1,6 +1,7 @@
 package com.uber.pagos.infraestructure.entry_points;
 
 import com.uber.pagos.domain.exception.ErrorExternoException;
+import com.uber.pagos.domain.exception.UsuarioNoEncontradoException;
 import com.uber.pagos.domain.exception.EstadoPagoInvalidoException;
 import com.uber.pagos.domain.exception.PagoNoEncontradoException;
 import com.uber.pagos.infraestructure.entry_points.dto.ApiError;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EstadoPagoInvalidoException.class)
     public ResponseEntity<ApiError> handleEstadoInvalido(EstadoPagoInvalidoException ex, HttpServletRequest req) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(UsuarioNoEncontradoException.class)
+    public ResponseEntity<ApiError> handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
     @ExceptionHandler(ErrorExternoException.class)
