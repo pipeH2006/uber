@@ -20,6 +20,7 @@ export default function PanelConductor({ usuarios, viajes, refrescar }) {
   const entrantes = mios.filter((v) => v.estado === 'ASIGNADO');
   const enCurso = mios.filter((v) => v.estado === 'EN_CURSO');
   const historial = mios.filter((v) => v.estado === 'FINALIZADO' || v.estado === 'CANCELADO').slice(0, 5);
+  const habilitado = yo?.estado === 'ACTIVO' && yo?.estadoDocumento === 'VERIFICADO';
   const nombrePasajero = (id) => {
     const p = usuarios.find((u) => u.id === id);
     return p ? `#${p.id} ${p.nombre}` : `#${id}`;
@@ -60,7 +61,14 @@ export default function PanelConductor({ usuarios, viajes, refrescar }) {
 
         {error && <div className="aviso error">{error}</div>}
 
-        {yo && entrantes.length === 0 && enCurso.length === 0 && (
+        {yo && !habilitado && (
+          <div className="aviso">
+            Para recibir viajes tu cuenta debe estar <b>ACTIVA</b> (ahora: {yo.estado}) y tu documento{' '}
+            <b>VERIFICADO</b> (ahora: {yo.estadoDocumento}). Se cambia en <b>Gestión de usuarios</b>.
+          </div>
+        )}
+
+        {yo && habilitado && entrantes.length === 0 && enCurso.length === 0 && (
           <section className="bloque vacio">
             <div className="radar" aria-hidden="true" />
             <p>Esperando solicitudes…</p>

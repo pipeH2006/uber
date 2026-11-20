@@ -14,7 +14,6 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
   const [destino, setDestino] = useState(null);
   const [estimacion, setEstimacion] = useState(null);
   const [conductorId, setConductorId] = useState('');
-  const [fraude, setFraude] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,7 +22,10 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
   }, [pasajeroId]);
 
   const yo = usuarios.find((u) => u.id === pasajeroId && u.rol === 'PASAJERO') || null;
-  const conductores = usuarios.filter((u) => u.rol === 'CONDUCTOR');
+  const conductores = usuarios.filter(
+    (u) => u.rol === 'CONDUCTOR' && u.estado === 'ACTIVO' && u.estadoDocumento === 'VERIFICADO',
+  );
+  const cuentaActiva = yo?.estado === 'ACTIVO';
   const misViajes = viajes.filter((v) => v.pasajeroId === yo?.id).sort((a, b) => b.id - a.id);
   const activo = misViajes.find((v) => ACTIVOS.includes(v.estado)) || null;
   const ultimo = misViajes[0] || null;
@@ -82,7 +84,6 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
       setOrigen(null);
       setDestino(null);
       setEstimacion(null);
-      setFraude(null);
       await refrescar.viajes();
     });
 
@@ -101,13 +102,7 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
         moneda: porPagar.moneda || 'USD',
         metodoPago: 'TARJETA',
       });
-      setFraude(null);
       await refrescar.pagos();
-    });
-
-  const evaluarFraude = () =>
-    ejecutar(async () => {
-      setFraude(await api.evaluarFraude(pagoUltimo.id));
     });
 
   return (
@@ -131,6 +126,12 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
         />
 
         {error && <div className="aviso error">{error}</div>}
+
+        {yo && !cuentaActiva && (
+          <div className="aviso">
+            Tu cuenta está <b>{yo.estado}</b>: no puedes pedir viajes hasta que la activen en <b>Gestión de usuarios</b>.
+          </div>
+        )}
 
         {yo && activo && (
           <section className="bloque">
@@ -176,15 +177,6 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
             <p className="dato">
               {dinero(pagoUltimo.monto, pagoUltimo.moneda)} · ref {pagoUltimo.referencia}
             </p>
-            <button type="button" className="secundario" onClick={evaluarFraude} disabled={cargando}>
-              🛡️ Evaluar fraude (IA)
-            </button>
-            {fraude && (
-              <div className={`resultado riesgo-${String(fraude.riesgo).toLowerCase()}`}>
-                Riesgo <b>{fraude.riesgo}</b> · score {fraude.score}
-                <p className="ayuda">{fraude.justificacion}</p>
-              </div>
-            )}
           </section>
         )}
 
@@ -195,7 +187,7 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
           </section>
         )}
 
-        {yo && !activo && (
+        {yo && cuentaActiva && !activo && (
           <section className="bloque">
             <h2>Pedir un viaje</h2>
             <p className="ayuda">Toca el mapa: primero el origen (verde) y luego el destino (rojo). Al estimar verás la ruta por calles.</p>
@@ -219,7 +211,10 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
             )}
 
             {conductores.length === 0 ? (
-              <p className="aviso">Aún no hay conductores. Regístrate uno en el panel de la derecha.</p>
+              <p className="aviso">
+                No hay conductores habilitados: deben estar activos y con el documento verificado. Habilítalos en
+                <b> Gestión de usuarios</b>.
+              </p>
             ) : (
               <label className="campo">
                 Conductor

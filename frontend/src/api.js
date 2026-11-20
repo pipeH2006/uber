@@ -30,6 +30,13 @@ export const api = {
   registrarUsuario: (data) =>
     request(`${USUARIOS}/api/v1/usuarios`, { method: 'POST', body: JSON.stringify(data) }),
   listarUsuarios: () => request(`${USUARIOS}/api/v1/usuarios`),
+  activar: (id) => request(`${USUARIOS}/api/v1/usuarios/${id}/activar`, { method: 'POST' }),
+  desactivar: (id) => request(`${USUARIOS}/api/v1/usuarios/${id}/desactivar`, { method: 'POST' }),
+  suspender: (id) => request(`${USUARIOS}/api/v1/usuarios/${id}/suspender`, { method: 'POST' }),
+  verificarDocumento: (id) =>
+    request(`${USUARIOS}/api/v1/usuarios/${id}/verificar-documento`, { method: 'POST' }),
+  rechazarDocumento: (id) =>
+    request(`${USUARIOS}/api/v1/usuarios/${id}/rechazar-documento`, { method: 'POST' }),
 
   // Viajes
   estimar: (data) =>
