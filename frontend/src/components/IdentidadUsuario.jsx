@@ -23,6 +23,7 @@ export default function IdentidadUsuario({ rol, etiqueta, usuarios, seleccionado
       const nuevo = await api.registrarUsuario({
         nombre: form.get('nombre'),
         email: form.get('email'),
+        telefono: form.get('telefono') || null,
         contrasena: form.get('contrasena'),
         rol,
       });
@@ -66,6 +67,7 @@ export default function IdentidadUsuario({ rol, etiqueta, usuarios, seleccionado
         <form onSubmit={registrar} className="formulario">
           <input name="nombre" placeholder="Nombre" required />
           <input name="email" type="email" placeholder="Email" required />
+          <input name="telefono" type="tel" placeholder="Teléfono (el mismo de tu Telegram)" />
           <input name="contrasena" type="password" placeholder="Contraseña (mín. 6)" minLength={6} required />
           <div className="fila">
             <button type="submit" disabled={cargando}>
@@ -93,6 +95,10 @@ export default function IdentidadUsuario({ rol, etiqueta, usuarios, seleccionado
               </button>
               <p className="ayuda">
                 Se abre el bot: pulsa <b>Iniciar</b> y vuelve aquí. Esta pantalla se actualiza sola.
+              </p>
+              <p className="ayuda">
+                ¿Prefieres usar tu teléfono? Abre <a href={`https://t.me/${BOT_USERNAME}`} target="_blank" rel="noreferrer">el bot</a>,
+                escribe /start y pulsa «Compartir mi número»: lo reconocemos por el teléfono con el que te registraste.
               </p>
             </>
           )}
