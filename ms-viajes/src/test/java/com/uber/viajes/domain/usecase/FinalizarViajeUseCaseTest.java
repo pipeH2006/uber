@@ -60,6 +60,21 @@ class FinalizarViajeUseCaseTest {
     }
 
     @Test
+    void finalizar_conductorConChat_recibeSuGananciaEstimada() {
+        Viaje v = Viaje.builder().id(1L).pasajeroId(7L).conductorId(8L).estado(EstadoViaje.EN_CURSO)
+                .costoEstimado(new BigDecimal("13.50")).build();
+        when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(7L)).thenReturn(Optional.of("777"));
+        when(usuarioGateway.obtenerChatIdTelegram(8L)).thenReturn(Optional.of("888"));
+
+        useCase.finalizar(1L);
+
+        verify(notificacionGateway).notificar("777", "Tu viaje ha finalizado");
+        verify(notificacionGateway).notificar("888", "Finalizaste el viaje. Ganancia estimada: 13.50 USD");
+    }
+
+    @Test
     void finalizar_pasajeroSinChat_finalizaSinNotificar() {
         Viaje v = Viaje.builder().id(1L).pasajeroId(7L).estado(EstadoViaje.EN_CURSO)
                 .costoEstimado(new BigDecimal("13.50")).build();

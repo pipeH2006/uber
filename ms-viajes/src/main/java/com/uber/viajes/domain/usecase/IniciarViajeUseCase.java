@@ -28,8 +28,15 @@ public class IniciarViajeUseCase {
         viaje.setEstado(EstadoViaje.EN_CURSO);
         viaje.setFechaInicio(LocalDateTime.now());
         Viaje guardado = viajeGateway.guardar(viaje);
-        usuarioGateway.obtenerChatIdTelegram(viaje.getPasajeroId())
-                .ifPresent(chatId -> notificacionGateway.notificar(chatId, "Tu viaje ha comenzado, ¡buen viaje!"));
+        avisar(viaje.getPasajeroId(), "Tu viaje ha comenzado, ¡buen viaje!");
+        avisar(viaje.getConductorId(), "Comenzaste el viaje. ¡Buen camino!");
         return guardado;
+    }
+
+    private void avisar(Long usuarioId, String mensaje) {
+        if (usuarioId != null) {
+            usuarioGateway.obtenerChatIdTelegram(usuarioId)
+                    .ifPresent(chatId -> notificacionGateway.notificar(chatId, mensaje));
+        }
     }
 }

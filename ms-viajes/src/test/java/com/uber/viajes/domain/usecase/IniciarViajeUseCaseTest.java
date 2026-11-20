@@ -66,6 +66,20 @@ class IniciarViajeUseCaseTest {
     }
 
     @Test
+    void iniciar_conductorConChat_tambienRecibeConfirmacion() {
+        Viaje v = Viaje.builder().id(1L).pasajeroId(7L).conductorId(8L).estado(EstadoViaje.ASIGNADO).build();
+        when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(7L)).thenReturn(Optional.of("777"));
+        when(usuarioGateway.obtenerChatIdTelegram(8L)).thenReturn(Optional.of("888"));
+
+        useCase.iniciar(1L);
+
+        verify(notificacionGateway).notificar("777", "Tu viaje ha comenzado, ¡buen viaje!");
+        verify(notificacionGateway).notificar("888", "Comenzaste el viaje. ¡Buen camino!");
+    }
+
+    @Test
     void iniciar_pasajeroSinChat_noNotifica() {
         Viaje v = Viaje.builder().id(1L).pasajeroId(7L).estado(EstadoViaje.ASIGNADO).build();
         when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));

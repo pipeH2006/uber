@@ -70,7 +70,7 @@ class SolicitarViajeUseCaseTest {
         assertThat(viaje.getMoneda()).isEqualTo("USD");
         assertThat(viaje.getFechaSolicitud()).isNotNull();
 
-        verify(notificacionGateway).notificar("555", "Se te ha asignado un nuevo viaje");
+        verify(notificacionGateway).notificar("555", "Se te ha asignado un nuevo viaje: 10.0 km · 20 min · 13.50 USD");
     }
 
     @Test
