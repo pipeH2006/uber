@@ -9,7 +9,7 @@ function ClickCatcher({ onPick }) {
   return null;
 }
 
-export default function MapPicker({ origen, destino, onPick }) {
+export default function MapPicker({ origen, destino, onPick, altura = 300 }) {
   const center = origen || { lat: 4.711, lng: -74.0721 };
 
   return (
@@ -17,7 +17,7 @@ export default function MapPicker({ origen, destino, onPick }) {
       center={[center.lat, center.lng]}
       zoom={12}
       scrollWheelZoom
-      style={{ height: '420px', width: '100%', borderRadius: '12px' }}
+      style={{ height: `${altura}px`, width: '100%', borderRadius: '12px' }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
