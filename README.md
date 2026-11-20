@@ -58,7 +58,7 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
 - **Pruebas:** JUnit 5 + Mockito + MockMvc + MockWebServer + H2
 - **Cobertura:** JaCoCo (umbral 90% por microservicio)
 - **Contenedores:** Docker (Dockerfile multi-etapa por servicio)
-- **Despliegue:** Render (Web Service por microservicio + PostgreSQL)
+- **Despliegue:** Render (Web Service por microservicio) + PostgreSQL en Neon
 - **Carga/estrés:** k6
 
 ---
@@ -274,24 +274,24 @@ El reporte queda en `target/site/jacoco/index.html`.
 
 > ⚠️ Despliega **cada microservicio por separado**, no el bloque completo.
 >
-> **Nota sobre el plan gratuito:** Render free solo permite **1 base PostgreSQL activa** por cuenta. Por eso, en Render los 4 microservicios **comparten una sola base de datos** (`uber-db`) — no hay conflicto porque cada servicio usa tablas con nombres distintos. En local (`docker-compose.yml`) también se usa una sola base `uber` compartida.
+> **Base de datos:** los 4 microservicios **comparten una sola base PostgreSQL alojada en [Neon](https://neon.com)** (plan gratuito, no caduca a los 30 días como el de Render) — no hay conflicto porque cada servicio usa tablas con nombres distintos. Crea el proyecto en Neon, copia la cadena de **Connect → Pooled connection** y úsala como `DB_URL` en los 4 servicios. Acepta el formato `postgresql://...?sslmode=require` tal cual (se descarta `channel_binding`, que el driver JDBC no soporta). Neon suspende el cómputo sin uso: la primera consulta tras un rato tarda más. En local (`docker-compose.yml`) se usa una sola base `uber` en Docker.
 
 ### Opción A — Blueprint (todo de una vez, opcional)
 
 1. Sube este repositorio a GitHub.
 2. En Render: **New → Blueprint** y conecta el repo.
-3. Render leerá `render.yaml` y creará los 4 servicios + 1 base PostgreSQL compartida (`uber-db`).
-4. Ingresa las claves (`GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
+3. Render leerá `render.yaml` y creará los 4 servicios. Te pedirá `DB_URL` (la cadena de Neon, la misma en los 4).
+4. Ingresa `DB_URL` y las claves (`GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
 
 ### Opción B — Manual (lo que suele mostrar el profe)
 
 Repite estos pasos para **cada** microservicio:
 
-1. **Base de datos:** Render → **New → PostgreSQL** (créala una sola vez y reutiliza la misma connection string en los 4 servicios). Copia la *Internal Connection String* (algo como `postgres://user:pass@host:5432/nombre`).
+1. **Base de datos:** crea **una sola** en [Neon](https://neon.com) y reutiliza la misma connection string en los 4 servicios. Copia la cadena de **Connect → Pooled connection** (algo como `postgresql://user:pass@ep-xxxx-pooler.region.aws.neon.tech/neondb?sslmode=require`).
 2. **Web Service:** Render → **New → Web Service** → conecta el repo GitHub.
 3. En *Root Directory* pon la carpeta del microservicio (ej. `ms-usuarios`) y *Dockerfile Path* = `Dockerfile` (o usa **Docker** como runtime).
 4. Configura las variables de entorno:
-   - `DB_URL` = la *Internal Connection String* que copiaste (el `DatabaseUrlConfig` la convierte a JDBC automáticamente).
+   - `DB_URL` = la cadena de Neon que copiaste (el `DatabaseUrlConfig` la convierte a JDBC automáticamente).
    - `PORT` = `8081` (o el puerto del servicio).
    - Las claves externas según el servicio.
 5. **Deploy** y verifica en `https://tu-servicio.onrender.com/actuator/health`.

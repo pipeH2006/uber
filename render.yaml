@@ -1,12 +1,14 @@
-# Render Blueprint: despliega los 4 microservicios + 1 base PostgreSQL COMPARTIDA.
+# Render Blueprint: despliega los 4 microservicios. La base PostgreSQL es UNA sola,
+# compartida y alojada en Neon (https://neon.com), no en Render.
 #
-# IMPORTANTE (límite del plan gratuito de Render):
-#   - Render free solo permite UNA base PostgreSQL activa por workspace.
-#   - Por eso los 4 microservicios comparten UNA sola base de datos aquí.
-#   - No hay conflicto de tablas: cada microservicio usa nombres distintos
-#     (usuarios, calificaciones, viajes, pagos, notificaciones, plantillas).
+# DB_URL no está en este archivo (sync: false): Render la pide al crear el Blueprint.
+# Pega la misma cadena de Neon (Connect > Pooled connection) en los 4 servicios, p. ej.:
+#   postgresql://USUARIO:CLAVE@ep-xxxx-pooler.REGION.aws.neon.tech/neondb?sslmode=require
 #
-# En LOCAL (docker-compose.yml) también se usa UNA sola base `uber`, compartida por los 4 servicios.
+# No hay conflicto de tablas: cada microservicio usa nombres distintos
+# (usuarios, calificaciones, viajes, pagos, notificaciones, plantillas).
+#
+# En LOCAL (docker-compose.yml) se usa UNA sola base `uber` en Docker, compartida por los 4 servicios.
 
 services:
   - type: web
@@ -18,9 +20,7 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: DB_URL
-        fromDatabase:
-          name: uber-db
-          property: connectionString
+        sync: false
 
   - type: web
     name: uber-ms-viajes
@@ -31,9 +31,7 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: DB_URL
-        fromDatabase:
-          name: uber-db
-          property: connectionString
+        sync: false
       - key: OSRM_BASE_URL
         value: "https://router.project-osrm.org"
       - key: NOTIFICACIONES_URL
@@ -50,9 +48,7 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: DB_URL
-        fromDatabase:
-          name: uber-db
-          property: connectionString
+        sync: false
       - key: GROQ_API_KEY
         sync: false
       - key: NOTIFICACIONES_URL
@@ -69,12 +65,6 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: DB_URL
-        fromDatabase:
-          name: uber-db
-          property: connectionString
+        sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-
-databases:
-  - name: uber-db
-    plan: free
