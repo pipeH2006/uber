@@ -58,6 +58,8 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  background: var(--tinta);
   min-height: 0;
 }
 
@@ -79,14 +81,6 @@ body {
 .panel.conductor {
   --acento: var(--conductor);
   --acento-fondo: var(--conductor-fondo);
-  border-left: 3px solid var(--tinta);
-}
-
-@media (max-width: 900px) {
-  .panel.conductor {
-    border-left: none;
-    border-top: 3px solid var(--tinta);
-  }
 }
 
 .panel-cabecera {
@@ -320,15 +314,18 @@ input {
 }
 
 .resultado.riesgo-bajo {
-  border-left: 4px solid #16a34a;
+  background: #f0fdf4;
+  color: #166534;
 }
 
 .resultado.riesgo-medio {
-  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
 }
 
 .resultado.riesgo-alto {
-  border-left: 4px solid #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 .insignia {
