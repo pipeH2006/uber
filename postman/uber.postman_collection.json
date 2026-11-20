@@ -224,7 +224,39 @@
               ]
             },
             {
-              "name": "1.03 Login del pasajero",
+              "name": "1.03 Activar pasajero",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{pasajeroId}}/activar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{pasajeroId}}",
+                    "activar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Queda ACTIVO\", () => pm.expect(pm.response.json().estado).to.eql(\"ACTIVO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.04 Login del pasajero (ya activo)",
               "request": {
                 "method": "POST",
                 "header": [
@@ -262,38 +294,6 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "name": "1.04 Activar pasajero",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{pasajeroId}}/activar",
-                  "host": [
-                    "{{baseUsuarios}}"
-                  ],
-                  "path": [
-                    "api",
-                    "v1",
-                    "usuarios",
-                    "{{pasajeroId}}",
-                    "activar"
-                  ]
-                }
-              },
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
-                      "pm.test(\"Queda ACTIVO\", () => pm.expect(pm.response.json().estado).to.eql(\"ACTIVO\"));"
                     ]
                   }
                 }
@@ -357,6 +357,70 @@
                     "exec": [
                       "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
                       "pm.test(\"Documento VERIFICADO\", () => pm.expect(pm.response.json().estadoDocumento).to.eql(\"VERIFICADO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.06b Rechazar el documento del conductor",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/rechazar-documento",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "rechazar-documento"
+                  ]
+                },
+                "description": "Solo para mostrar el cambio de estado: el paso siguiente lo vuelve a verificar."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Documento RECHAZADO\", () => pm.expect(pm.response.json().estadoDocumento).to.eql(\"RECHAZADO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.06c Verificar de nuevo el documento",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/verificar-documento",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "verificar-documento"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
                     ]
                   }
                 }
@@ -1364,6 +1428,101 @@
               ]
             },
             {
+              "name": "Activar",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}/activar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}",
+                    "activar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Suspender",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}/suspender",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}",
+                    "suspender"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Queda SUSPENDIDO\", () => pm.expect(pm.response.json().estado).to.eql(\"SUSPENDIDO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Reactivar (activar un suspendido)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}/activar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}",
+                    "activar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Vuelve a ACTIVO\", () => pm.expect(pm.response.json().estado).to.eql(\"ACTIVO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
               "name": "Desactivar",
               "request": {
                 "method": "POST",
@@ -2321,6 +2480,128 @@
           ]
         },
         {
+          "name": "Registrar un conductor sin activar (para las dos pruebas siguientes)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Conductor pendiente\",\n  \"email\": \"pendiente{{$timestamp}}@correo.com\",\n  \"contrasena\": \"secreto123\",\n  \"rol\": \"CONDUCTOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                  "pm.collectionVariables.set(\"conductorPendienteId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitar con un conductor sin activar → 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/solicitar",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "solicitar"
+              ]
+            },
+            "description": "Regla: el conductor debe estar ACTIVO y con el documento VERIFICADO.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pasajeroId\": \"{{pasajeroId}}\",\n  \"conductorId\": \"{{conductorPendienteId}}\",\n  \"origenLat\": 4.711,\n  \"origenLng\": -74.072,\n  \"destinoLat\": 4.653,\n  \"destinoLng\": -74.083\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rechazar el documento de un pasajero → 422",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios/{{pasajeroId}}/rechazar-documento",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{pasajeroId}}",
+                "rechazar-documento"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Iniciar un viaje ya finalizado → 409",
           "request": {
             "method": "POST",
@@ -2737,6 +3018,10 @@
     },
     {
       "key": "crudUsuarioId",
+      "value": ""
+    },
+    {
+      "key": "conductorPendienteId",
       "value": ""
     },
     {

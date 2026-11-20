@@ -101,9 +101,11 @@ com.uber.<servicio>
 | PUT | `/usuarios/{id}` | Actualizar (CRUD) |
 | DELETE | `/usuarios/{id}` | Eliminar (CRUD) |
 | POST | `/auth/login` | Iniciar sesión |
-| POST | `/usuarios/{id}/activar` | Activar cuenta |
+| POST | `/usuarios/{id}/activar` | Activar cuenta (también reactiva una suspendida) |
 | POST | `/usuarios/{id}/desactivar` | Desactivar cuenta |
 | POST | `/usuarios/{id}/verificar-documento` | Verificar licencia del conductor |
+| POST | `/usuarios/{id}/rechazar-documento` | Marcar como rechazada la licencia del conductor |
+| POST | `/usuarios/{id}/suspender` | Suspender (bloquear) una cuenta |
 | POST | `/usuarios/{id}/calificar` | Calificar a un usuario |
 | GET | `/usuarios/{id}/calificacion-promedio` | Promedio de calificación |
 
@@ -117,7 +119,7 @@ com.uber.<servicio>
 | PUT | `/viajes/{id}` | Actualizar (CRUD) |
 | DELETE | `/viajes/{id}` | Eliminar (CRUD) |
 | POST | `/viajes/estimar` | Estimar tarifa (OSRM + dólar) |
-| POST | `/viajes/solicitar` | Solicitar viaje y asignar conductor |
+| POST | `/viajes/solicitar` | Solicitar viaje y asignar conductor (pasajero y conductor ACTIVOS y conductor con licencia VERIFICADA; 409 si no) |
 | POST | `/viajes/{id}/iniciar` | Iniciar viaje |
 | POST | `/viajes/{id}/finalizar` | Finalizar viaje (calcula costo final) |
 | POST | `/viajes/{id}/cancelar` | Cancelar viaje (solo antes de que el conductor lo inicie; en curso responde 409) |
