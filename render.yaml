@@ -6,7 +6,7 @@
 #   - No hay conflicto de tablas: cada microservicio usa nombres distintos
 #     (usuarios, calificaciones, viajes, pagos, notificaciones, plantillas).
 #
-# En LOCAL (docker-compose.yml) sí se usan 4 bases separadas, una por servicio.
+# En LOCAL (docker-compose.yml) también se usa UNA sola base `uber`, compartida por los 4 servicios.
 
 services:
   - type: web

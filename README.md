@@ -273,20 +273,20 @@ El reporte queda en `target/site/jacoco/index.html`.
 
 > ⚠️ Despliega **cada microservicio por separado**, no el bloque completo.
 >
-> **Nota sobre el plan gratuito:** Render free solo permite **1 base PostgreSQL activa** por cuenta. Por eso, en Render los 4 microservicios **comparten una sola base de datos** (`uber-db`) — no hay conflicto porque cada servicio usa tablas con nombres distintos. En local (`docker-compose.yml`) sí se usan 4 bases separadas.
+> **Nota sobre el plan gratuito:** Render free solo permite **1 base PostgreSQL activa** por cuenta. Por eso, en Render los 4 microservicios **comparten una sola base de datos** (`uber-db`) — no hay conflicto porque cada servicio usa tablas con nombres distintos. En local (`docker-compose.yml`) también se usa una sola base `uber` compartida.
 
 ### Opción A — Blueprint (todo de una vez, opcional)
 
 1. Sube este repositorio a GitHub.
 2. En Render: **New → Blueprint** y conecta el repo.
-3. Render leerá `render.yaml` y creará los 4 servicios + 4 bases PostgreSQL.
+3. Render leerá `render.yaml` y creará los 4 servicios + 1 base PostgreSQL compartida (`uber-db`).
 4. Ingresa las claves (`GROQ_API_KEY`, `TELEGRAM_BOT_TOKEN`) cuando las pida. (OSRM no necesita clave.)
 
 ### Opción B — Manual (lo que suele mostrar el profe)
 
 Repite estos pasos para **cada** microservicio:
 
-1. **Base de datos:** Render → **New → PostgreSQL**. Copia la *Internal Connection String* (algo como `postgres://user:pass@host:5432/nombre`).
+1. **Base de datos:** Render → **New → PostgreSQL** (créala una sola vez y reutiliza la misma connection string en los 4 servicios). Copia la *Internal Connection String* (algo como `postgres://user:pass@host:5432/nombre`).
 2. **Web Service:** Render → **New → Web Service** → conecta el repo GitHub.
 3. En *Root Directory* pon la carpeta del microservicio (ej. `ms-usuarios`) y *Dockerfile Path* = `Dockerfile` (o usa **Docker** como runtime).
 4. Configura las variables de entorno:
