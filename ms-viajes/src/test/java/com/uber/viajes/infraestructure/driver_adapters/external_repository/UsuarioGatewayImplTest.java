@@ -1,6 +1,7 @@
 package com.uber.viajes.infraestructure.driver_adapters.external_repository;
 
 import com.uber.viajes.domain.exception.ErrorExternoException;
+import com.uber.viajes.domain.model.UsuarioResumen;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -36,46 +37,59 @@ class UsuarioGatewayImplTest {
         return new MockResponse().setHeader("Content-Type", "application/json").setBody(body);
     }
 
-    // ---- usuarioExiste ----
+    // ---- buscarUsuario ----
 
     @Test
-    void usuarioExiste_respuesta200_devuelveTrue() throws Exception {
-        mockWebServer.enqueue(json("{\"id\":7}"));
+    void buscarUsuario_respuesta200_devuelveEstadoYDocumento() throws Exception {
+        mockWebServer.enqueue(json("{\"id\":7,\"estado\":\"ACTIVO\",\"estadoDocumento\":\"VERIFICADO\"}"));
 
-        assertThat(gateway.usuarioExiste(7L)).isTrue();
+        UsuarioResumen usuario = gateway.buscarUsuario(7L).orElseThrow();
 
+        assertThat(usuario.estaActivo()).isTrue();
+        assertThat(usuario.documentoVerificado()).isTrue();
         RecordedRequest request = mockWebServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo("/api/v1/usuarios/7");
     }
 
     @Test
-    void usuarioExiste_respuesta404_devuelveFalse() {
+    void buscarUsuario_usuarioPendiente_noEstaActivo() {
+        mockWebServer.enqueue(json("{\"id\":7,\"estado\":\"PENDIENTE\",\"estadoDocumento\":\"NO_APLICA\"}"));
+
+        UsuarioResumen usuario = gateway.buscarUsuario(7L).orElseThrow();
+
+        assertThat(usuario.estaActivo()).isFalse();
+        assertThat(usuario.documentoVerificado()).isFalse();
+    }
+
+    @Test
+    void buscarUsuario_respuesta404_devuelveVacio() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThat(gateway.usuarioExiste(99L)).isFalse();
+        assertThat(gateway.buscarUsuario(99L)).isEmpty();
     }
 
     @Test
-    void usuarioExiste_errorServidor_lanzaErrorExterno() {
+    void buscarUsuario_cuerpoVacio_lanzaErrorExterno() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+
+        assertThatThrownBy(() -> gateway.buscarUsuario(7L)).isInstanceOf(ErrorExternoException.class);
+    }
+
+    @Test
+    void buscarUsuario_errorServidor_lanzaErrorExterno() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-        assertThatThrownBy(() -> gateway.usuarioExiste(7L)).isInstanceOf(ErrorExternoException.class);
+        assertThatThrownBy(() -> gateway.buscarUsuario(7L)).isInstanceOf(ErrorExternoException.class);
     }
 
     @Test
-    void usuarioExiste_urlVacia_omiteValidacion() {
-        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), "");
+    void buscarUsuario_urlSinConfigurar_omiteLaValidacion() {
+        UsuarioResumen vacia = new UsuarioGatewayImpl(RestClient.builder().build(), "").buscarUsuario(7L).orElseThrow();
+        UsuarioResumen nula = new UsuarioGatewayImpl(RestClient.builder().build(), null).buscarUsuario(7L).orElseThrow();
 
-        assertThat(sinUrl.usuarioExiste(7L)).isTrue();
-        assertThat(mockWebServer.getRequestCount()).isZero();
-    }
-
-    @Test
-    void usuarioExiste_urlNula_omiteValidacion() {
-        UsuarioGatewayImpl sinUrl = new UsuarioGatewayImpl(RestClient.builder().build(), null);
-
-        assertThat(sinUrl.usuarioExiste(7L)).isTrue();
+        assertThat(vacia.estaActivo() && vacia.documentoVerificado()).isTrue();
+        assertThat(nula.estaActivo() && nula.documentoVerificado()).isTrue();
         assertThat(mockWebServer.getRequestCount()).isZero();
     }
 

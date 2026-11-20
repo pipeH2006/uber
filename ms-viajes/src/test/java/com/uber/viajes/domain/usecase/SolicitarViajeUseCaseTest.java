@@ -1,9 +1,11 @@
 package com.uber.viajes.domain.usecase;
 
 import com.uber.viajes.domain.exception.UsuarioNoEncontradoException;
+import com.uber.viajes.domain.exception.UsuarioNoHabilitadoException;
 import com.uber.viajes.domain.model.Coordenada;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
+import com.uber.viajes.domain.model.UsuarioResumen;
 import com.uber.viajes.domain.model.Viaje;
 import com.uber.viajes.domain.model.gateway.NotificacionGateway;
 import com.uber.viajes.domain.model.gateway.UsuarioGateway;
@@ -45,7 +47,8 @@ class SolicitarViajeUseCaseTest {
     @BeforeEach
     void setUp() {
         useCase = new SolicitarViajeUseCase(estimarViajeUseCase, notificacionGateway, viajeGateway, usuarioGateway);
-        lenient().when(usuarioGateway.usuarioExiste(any())).thenReturn(true);
+        lenient().when(usuarioGateway.buscarUsuario(any()))
+                .thenAnswer(inv -> Optional.of(new UsuarioResumen(inv.getArgument(0), "ACTIVO", "VERIFICADO")));
     }
 
     @Test
@@ -90,7 +93,7 @@ class SolicitarViajeUseCaseTest {
 
     @Test
     void solicitar_pasajeroInexistente_lanzaExcepcionSinCrearViaje() {
-        when(usuarioGateway.usuarioExiste(1L)).thenReturn(false);
+        when(usuarioGateway.buscarUsuario(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.solicitar(1L, 2L, new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
                 .isInstanceOf(UsuarioNoEncontradoException.class)
@@ -101,7 +104,7 @@ class SolicitarViajeUseCaseTest {
 
     @Test
     void solicitar_conductorInexistente_lanzaExcepcionSinCrearViaje() {
-        when(usuarioGateway.usuarioExiste(2L)).thenReturn(false);
+        when(usuarioGateway.buscarUsuario(2L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.solicitar(1L, 2L, new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
                 .isInstanceOf(UsuarioNoEncontradoException.class)
@@ -127,5 +130,37 @@ class SolicitarViajeUseCaseTest {
         useCase.solicitar(1L, 2L, origen, destino);
 
         verify(notificacionGateway).notificar("111", "Tu viaje #5 fue asignado a un conductor y va en camino");
+    }
+
+    private void usuario(Long id, String estado, String documento) {
+        when(usuarioGateway.buscarUsuario(id)).thenReturn(Optional.of(new UsuarioResumen(id, estado, documento)));
+    }
+
+    private void solicitarYEsperarRechazo(String mensaje) {
+        assertThatThrownBy(() -> useCase.solicitar(1L, 2L, new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
+                .isInstanceOf(UsuarioNoHabilitadoException.class)
+                .hasMessageContaining(mensaje);
+        verifyNoInteractions(estimarViajeUseCase, viajeGateway, notificacionGateway);
+    }
+
+    @Test
+    void solicitar_pasajeroNoActivo_lanzaExcepcionSinCrearViaje() {
+        usuario(1L, "PENDIENTE", "NO_APLICA");
+
+        solicitarYEsperarRechazo("pasajero 1 no está activo");
+    }
+
+    @Test
+    void solicitar_conductorNoActivo_lanzaExcepcionSinCrearViaje() {
+        usuario(2L, "INACTIVO", "VERIFICADO");
+
+        solicitarYEsperarRechazo("conductor 2 no está activo");
+    }
+
+    @Test
+    void solicitar_conductorSinDocumentoVerificado_lanzaExcepcionSinCrearViaje() {
+        usuario(2L, "ACTIVO", "PENDIENTE");
+
+        solicitarYEsperarRechazo("no tiene el documento verificado");
     }
 }

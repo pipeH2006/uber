@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uber.viajes.domain.exception.ErrorExternoException;
 import com.uber.viajes.domain.exception.EstadoViajeInvalidoException;
 import com.uber.viajes.domain.exception.UsuarioNoEncontradoException;
+import com.uber.viajes.domain.exception.UsuarioNoHabilitadoException;
 import com.uber.viajes.domain.exception.ViajeNoEncontradoException;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Estimacion;
@@ -226,6 +227,18 @@ class ViajeControllerTest {
                         .content(objectMapper.writeValueAsString(new SolicitarViajeRequest(
                                 10L, 20L, 4.71, -74.07, "Cra 7", 4.60, -74.08, "Aeropuerto"))))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void solicitar_usuarioNoHabilitado_devuelve409() throws Exception {
+        when(solicitarUseCase.solicitar(eq(10L), eq(20L), any(), any()))
+                .thenThrow(new UsuarioNoHabilitadoException("El conductor 20 no está activo"));
+
+        mockMvc.perform(post("/api/v1/viajes/solicitar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new SolicitarViajeRequest(
+                                10L, 20L, 4.71, -74.07, "Cra 7", 4.60, -74.08, "Aeropuerto"))))
+                .andExpect(status().isConflict());
     }
 
     @Test

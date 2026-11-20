@@ -2,6 +2,7 @@ package com.uber.viajes.infraestructure.driver_adapters.external_repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.uber.viajes.domain.exception.ErrorExternoException;
+import com.uber.viajes.domain.model.UsuarioResumen;
 import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,19 +22,23 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
     }
 
     @Override
-    public boolean usuarioExiste(Long usuarioId) {
+    public Optional<UsuarioResumen> buscarUsuario(Long usuarioId) {
         if (urlNoConfigurada()) {
             log.warn("URL de usuarios no configurada; se omite la validacion del usuario {}", usuarioId);
-            return true;
+            return Optional.of(new UsuarioResumen(usuarioId, "ACTIVO", "VERIFICADO"));
         }
         try {
-            restClient.get()
+            JsonNode usuario = restClient.get()
                     .uri("/api/v1/usuarios/{id}", usuarioId)
                     .retrieve()
-                    .toBodilessEntity();
-            return true;
+                    .body(JsonNode.class);
+            if (usuario == null) {
+                throw new ErrorExternoException("ms-usuarios devolvio una respuesta vacia");
+            }
+            return Optional.of(new UsuarioResumen(
+                    usuarioId, usuario.path("estado").asText(""), usuario.path("estadoDocumento").asText("")));
         } catch (HttpClientErrorException.NotFound e) {
-            return false;
+            return Optional.empty();
         } catch (Exception e) {
             throw new ErrorExternoException("Error al consultar el servicio de usuarios: " + e.getMessage());
         }
