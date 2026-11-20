@@ -1,6 +1,9 @@
 // Prueba de CARGA (load test) para las APIs DESPLEGADAS (no en local).
 // Verifica que el percentil 95 de respuesta esté por debajo de 500 ms.
 //
+// Antes de medir, setup() despierta los servicios (ver calentamiento.js): las peticiones de
+// calentamiento no cuentan en los umbrales.
+//
 // Uso (k6 instalado):
 //   k6 run k6/load-test.js -e BASE_USUARIOS=https://... -e BASE_VIAJES=https://... \
 //        -e BASE_PAGOS=https://... -e BASE_NOTIF=https://...
@@ -9,6 +12,7 @@
 
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { calentar, TAGS_MEDICION } from './calentamiento.js';
 
 const BASE_USUARIOS = __ENV.BASE_USUARIOS || 'http://localhost:8081';
 const BASE_VIAJES = __ENV.BASE_VIAJES || 'http://localhost:8082';
@@ -28,22 +32,28 @@ export const options = {
     },
   },
   thresholds: {
-    // Criterio de evaluación: tiempo de respuesta < 500 ms
-    http_req_duration: ['p(95)<500'],
-    http_req_failed: ['rate<0.01'],
+    // Criterio de evaluación: tiempo de respuesta < 500 ms (solo fase de medición)
+    'http_req_duration{fase:medicion}': ['p(95)<500'],
+    'http_req_failed{fase:medicion}': ['rate<0.01'],
   },
 };
 
+export function setup() {
+  calentar({ usuarios: BASE_USUARIOS, viajes: BASE_VIAJES, pagos: BASE_PAGOS, notif: BASE_NOTIF });
+}
+
 export default function () {
+  const medicion = { tags: TAGS_MEDICION };
+
   // Salud de los 4 microservicios
-  const hUsuarios = http.get(`${BASE_USUARIOS}/actuator/health`);
-  const hViajes = http.get(`${BASE_VIAJES}/actuator/health`);
-  const hPagos = http.get(`${BASE_PAGOS}/actuator/health`);
-  const hNotif = http.get(`${BASE_NOTIF}/actuator/health`);
+  const hUsuarios = http.get(`${BASE_USUARIOS}/actuator/health`, medicion);
+  const hViajes = http.get(`${BASE_VIAJES}/actuator/health`, medicion);
+  const hPagos = http.get(`${BASE_PAGOS}/actuator/health`, medicion);
+  const hNotif = http.get(`${BASE_NOTIF}/actuator/health`, medicion);
 
   // Lecturas de dominio
-  const usuarios = http.get(`${BASE_USUARIOS}/api/v1/usuarios`);
-  const plantillas = http.get(`${BASE_NOTIF}/api/v1/notificaciones/plantillas`);
+  const usuarios = http.get(`${BASE_USUARIOS}/api/v1/usuarios`, medicion);
+  const plantillas = http.get(`${BASE_NOTIF}/api/v1/notificaciones/plantillas`, medicion);
 
   // Operación con llamadas externas (OSRM + API de dólar)
   const estimar = http.post(
@@ -56,7 +66,7 @@ export default function () {
       destinoLng: -74.0836,
       destinoDireccion: 'Chapinero, Bogota',
     }),
-    { headers: { 'Content-Type': 'application/json' } },
+    { headers: { 'Content-Type': 'application/json' }, tags: TAGS_MEDICION },
   );
 
   check(hUsuarios, { 'usuarios health 200': (r) => r.status === 200 });
