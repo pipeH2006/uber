@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -50,6 +51,13 @@ public class UsuarioController {
         Usuario usuario = crudUseCase.registrar(toDomain(request));
         return ResponseEntity.created(URI.create("/api/v1/usuarios/" + usuario.getId()))
                 .body(UsuarioResponse.from(usuario));
+    }
+
+    @GetMapping("/usuarios/buscar-por-telefono")
+    public ResponseEntity<List<UsuarioResponse>> buscarPorTelefono(@RequestParam String telefono) {
+        return ResponseEntity.ok(crudUseCase.buscarPorTelefono(telefono).stream()
+                .map(UsuarioResponse::from)
+                .toList());
     }
 
     @GetMapping("/usuarios/{id}")

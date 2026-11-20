@@ -10,13 +10,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Vincula el chat de Telegram de un usuario cuando abre el bot con el enlace
- * {@code t.me/<bot>?start=<usuarioId>}: Telegram entrega el mensaje {@code /start <usuarioId>}.
+ * Vincula el chat de Telegram de un usuario de dos maneras:
+ * <ul>
+ *   <li>Enlace {@code t.me/<bot>?start=<usuarioId>}: Telegram entrega {@code /start <usuarioId>}.</li>
+ *   <li>Contacto: con {@code /start} a secas el bot pide compartir el número y se busca el usuario
+ *       registrado con ese teléfono.</li>
+ * </ul>
  */
 @RequiredArgsConstructor
 public class VincularTelegramUseCase {
 
-    private static final Pattern START = Pattern.compile("^/start\\s+(\\d{1,18})\\s*$");
+    private static final Pattern START_CON_ID = Pattern.compile("^/start\\s+(\\d{1,18})\\s*$");
+    private static final Pattern START_SIN_ID = Pattern.compile("^/start\\s*$");
 
     static final String MENSAJE_VINCULADO =
             "✅ ¡Listo! Tu Telegram quedó vinculado. Aquí te avisaremos de todo lo que pase con tus viajes.";
@@ -24,6 +29,14 @@ public class VincularTelegramUseCase {
             "No encontramos tu usuario. Vuelve a abrir este bot desde el botón «Vincular Telegram» de la app.";
     static final String MENSAJE_ERROR =
             "Ahora mismo no pudimos vincular tu cuenta. Intenta de nuevo en unos segundos desde la app.";
+    static final String MENSAJE_PEDIR_CONTACTO =
+            "👋 ¡Hola! Para vincular tu cuenta comparte tu número con el botón de abajo. "
+                    + "Debe ser el mismo teléfono con el que te registraste en la app.";
+    static final String MENSAJE_CONTACTO_AJENO =
+            "Ese contacto no es tu número. Pulsa /start y comparte tu propio número con el botón.";
+    static final String MENSAJE_TELEFONO_SIN_USUARIO =
+            "No encontramos ningún usuario registrado con ese teléfono. Regístrate en la app con este número "
+                    + "y vuelve a escribir /start.";
 
     private final TelegramGateway telegramGateway;
     private final UsuarioGateway usuarioGateway;
@@ -37,27 +50,55 @@ public class VincularTelegramUseCase {
         long siguiente = offset;
         for (ActualizacionTelegram actualizacion : telegramGateway.obtenerActualizaciones(offset)) {
             siguiente = Math.max(siguiente, actualizacion.updateId() + 1);
-            vincularSiCorresponde(actualizacion);
+            procesar(actualizacion);
         }
         return siguiente;
     }
 
-    private void vincularSiCorresponde(ActualizacionTelegram actualizacion) {
-        if (actualizacion.texto() == null || actualizacion.chatId() == null) {
+    private void procesar(ActualizacionTelegram actualizacion) {
+        String chatId = actualizacion.chatId();
+        if (chatId == null) {
             return;
         }
-        Matcher matcher = START.matcher(actualizacion.texto());
-        if (!matcher.matches()) {
+        if (actualizacion.telefono() != null) {
+            responder(chatId, actualizacion.contactoPropio()
+                    ? vincularPorTelefono(actualizacion.telefono(), chatId)
+                    : MENSAJE_CONTACTO_AJENO);
             return;
         }
-        responder(actualizacion.chatId(), vincular(Long.valueOf(matcher.group(1)), actualizacion.chatId()));
+        String texto = actualizacion.texto();
+        if (texto == null) {
+            return;
+        }
+        Matcher conId = START_CON_ID.matcher(texto);
+        if (conId.matches()) {
+            responder(chatId, vincularPorId(Long.valueOf(conId.group(1)), chatId));
+        } else if (START_SIN_ID.matcher(texto).matches()) {
+            pedirContacto(chatId);
+        }
     }
 
-    private String vincular(Long usuarioId, String chatId) {
+    private String vincularPorId(Long usuarioId, String chatId) {
         try {
             return usuarioGateway.vincularTelegram(usuarioId, chatId) ? MENSAJE_VINCULADO : MENSAJE_USUARIO_INEXISTENTE;
         } catch (RuntimeException e) {
             return MENSAJE_ERROR;
+        }
+    }
+
+    private String vincularPorTelefono(String telefono, String chatId) {
+        try {
+            return usuarioGateway.vincularPorTelefono(telefono, chatId) > 0 ? MENSAJE_VINCULADO : MENSAJE_TELEFONO_SIN_USUARIO;
+        } catch (RuntimeException e) {
+            return MENSAJE_ERROR;
+        }
+    }
+
+    private void pedirContacto(String chatId) {
+        try {
+            telegramGateway.solicitarContacto(chatId, MENSAJE_PEDIR_CONTACTO);
+        } catch (EnvioNotificacionException e) {
+            // Si no se pudo enviar el botón, el usuario puede volver a escribir /start.
         }
     }
 

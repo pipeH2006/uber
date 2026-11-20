@@ -71,14 +71,20 @@ class TelegramGatewayImplTest {
                 "{\"ok\":true,\"result\":["
                         + "{\"update_id\":10,\"message\":{\"chat\":{\"id\":555},\"text\":\"/start 7\"}},"
                         + "{\"update_id\":11,\"message\":{\"chat\":{\"id\":666}}},"
-                        + "{\"update_id\":12,\"edited_message\":{}}]}"));
+                        + "{\"update_id\":12,\"edited_message\":{}},"
+                        + "{\"update_id\":13,\"message\":{\"chat\":{\"id\":777},\"from\":{\"id\":777},"
+                        + "\"contact\":{\"phone_number\":\"573001234567\",\"user_id\":777}}},"
+                        + "{\"update_id\":14,\"message\":{\"chat\":{\"id\":888},\"from\":{\"id\":888},"
+                        + "\"contact\":{\"phone_number\":\"573119876543\",\"user_id\":999}}}]}"));
 
         List<ActualizacionTelegram> resultado = adapter("token-secreto").obtenerActualizaciones(10);
 
         assertThat(resultado).containsExactly(
                 new ActualizacionTelegram(10, "555", "/start 7"),
                 new ActualizacionTelegram(11, "666", null),
-                new ActualizacionTelegram(12, null, null));
+                new ActualizacionTelegram(12, null, null),
+                new ActualizacionTelegram(13, "777", null, "573001234567", true),
+                new ActualizacionTelegram(14, "888", null, "573119876543", false));
         assertThat(server.takeRequest().getPath()).isEqualTo("/bottoken-secreto/getUpdates?offset=10&timeout=0");
     }
 
@@ -99,6 +105,25 @@ class TelegramGatewayImplTest {
     @Test
     void obtenerActualizaciones_tokenVacio_noLlamaATelegram() {
         assertThat(adapter("").obtenerActualizaciones(0)).isEmpty();
+        assertThat(server.getRequestCount()).isZero();
+    }
+
+    @Test
+    void solicitarContacto_enviaElTecladoConBotonDeContacto() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"ok\":true}"));
+
+        adapter("token-secreto").solicitarContacto("123456", "Comparte tu número");
+
+        RecordedRequest request = server.takeRequest();
+        assertThat(request.getPath()).isEqualTo("/bottoken-secreto/sendMessage");
+        String cuerpo = request.getBody().readUtf8();
+        assertThat(cuerpo).contains("\"request_contact\":true").contains("\"one_time_keyboard\":true");
+    }
+
+    @Test
+    void solicitarContacto_tokenVacio_simulaSinLlamarATelegram() {
+        adapter("").solicitarContacto("123456", "hola");
+
         assertThat(server.getRequestCount()).isZero();
     }
 }

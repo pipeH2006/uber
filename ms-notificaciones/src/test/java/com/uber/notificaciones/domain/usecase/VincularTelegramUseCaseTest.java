@@ -88,7 +88,6 @@ class VincularTelegramUseCaseTest {
     void mensajesQueNoSonStartConUsuario_seIgnoranPeroAvanzaElOffset() {
         hayActualizaciones(
                 new ActualizacionTelegram(20, "555", "hola"),
-                new ActualizacionTelegram(21, "555", "/start"),
                 new ActualizacionTelegram(22, "555", "/start abc"),
                 new ActualizacionTelegram(23, null, null));
 
@@ -104,5 +103,63 @@ class VincularTelegramUseCaseTest {
         when(telegramGateway.obtenerActualizaciones(5)).thenReturn(List.of());
 
         assertThat(useCase.procesarActualizaciones(5)).isEqualTo(5);
+    }
+
+    @Test
+    void startSinId_pideCompartirElContacto() {
+        hayActualizaciones(new ActualizacionTelegram(30, "555", "/start"));
+
+        useCase.procesarActualizaciones(0);
+
+        verify(telegramGateway).solicitarContacto("555", VincularTelegramUseCase.MENSAJE_PEDIR_CONTACTO);
+        verifyNoInteractions(usuarioGateway);
+    }
+
+    @Test
+    void startSinId_siFallaElBoton_noInterrumpe() {
+        hayActualizaciones(new ActualizacionTelegram(30, "555", "/start"));
+        doThrow(new EnvioNotificacionException("fallo")).when(telegramGateway).solicitarContacto(anyString(), anyString());
+
+        assertThat(useCase.procesarActualizaciones(0)).isEqualTo(31);
+    }
+
+    @Test
+    void contactoPropio_vinculaPorTelefonoYConfirma() {
+        hayActualizaciones(new ActualizacionTelegram(40, "555", null, "573001234567", true));
+        when(usuarioGateway.vincularPorTelefono("573001234567", "555")).thenReturn(2);
+
+        useCase.procesarActualizaciones(0);
+
+        verify(telegramGateway).enviar("555", VincularTelegramUseCase.MENSAJE_VINCULADO);
+    }
+
+    @Test
+    void contactoPropio_sinUsuarioConEseTelefono_avisa() {
+        hayActualizaciones(new ActualizacionTelegram(40, "555", null, "573001234567", true));
+        when(usuarioGateway.vincularPorTelefono("573001234567", "555")).thenReturn(0);
+
+        useCase.procesarActualizaciones(0);
+
+        verify(telegramGateway).enviar("555", VincularTelegramUseCase.MENSAJE_TELEFONO_SIN_USUARIO);
+    }
+
+    @Test
+    void contactoPropio_fallaMsUsuarios_avisaQueSeIntenteDeNuevo() {
+        hayActualizaciones(new ActualizacionTelegram(40, "555", null, "573001234567", true));
+        when(usuarioGateway.vincularPorTelefono(anyString(), anyString())).thenThrow(new IllegalStateException("caído"));
+
+        useCase.procesarActualizaciones(0);
+
+        verify(telegramGateway).enviar("555", VincularTelegramUseCase.MENSAJE_ERROR);
+    }
+
+    @Test
+    void contactoDeOtraPersona_noVincula() {
+        hayActualizaciones(new ActualizacionTelegram(40, "555", null, "573001234567", false));
+
+        useCase.procesarActualizaciones(0);
+
+        verify(telegramGateway).enviar("555", VincularTelegramUseCase.MENSAJE_CONTACTO_AJENO);
+        verifyNoInteractions(usuarioGateway);
     }
 }

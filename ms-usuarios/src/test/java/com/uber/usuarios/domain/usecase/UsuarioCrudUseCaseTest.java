@@ -152,4 +152,37 @@ class UsuarioCrudUseCaseTest {
 
         assertThatThrownBy(() -> useCase.eliminar(99L)).isInstanceOf(UsuarioNoEncontradoException.class);
     }
+
+    private static Usuario conTelefono(Long id, String telefono) {
+        return Usuario.builder().id(id).nombre("U" + id).telefono(telefono).build();
+    }
+
+    @Test
+    void buscarPorTelefono_ignoraFormatoEIndicativoDelPais() {
+        Usuario ana = conTelefono(1L, "300 123 4567");
+        Usuario otro = conTelefono(2L, "3109998877");
+        Usuario sinTelefono = conTelefono(3L, null);
+        when(usuarioGateway.listar()).thenReturn(List.of(ana, otro, sinTelefono));
+
+        assertThat(useCase.buscarPorTelefono("573001234567")).containsExactly(ana);
+        assertThat(useCase.buscarPorTelefono("+57 (300) 123-4567")).containsExactly(ana);
+    }
+
+    @Test
+    void buscarPorTelefono_variosUsuariosConElMismoNumero_losDevuelveTodos() {
+        Usuario pasajero = conTelefono(1L, "3001234567");
+        Usuario conductor = conTelefono(2L, "+57 3001234567");
+        when(usuarioGateway.listar()).thenReturn(List.of(pasajero, conductor));
+
+        assertThat(useCase.buscarPorTelefono("3001234567")).containsExactly(pasajero, conductor);
+    }
+
+    @Test
+    void buscarPorTelefono_numeroCortoOSinCoincidencia_devuelveVacio() {
+        when(usuarioGateway.listar()).thenReturn(List.of(conTelefono(1L, "123456"), conTelefono(2L, "3001234567")));
+
+        assertThat(useCase.buscarPorTelefono("123456")).isEmpty();
+        assertThat(useCase.buscarPorTelefono(null)).isEmpty();
+        assertThat(useCase.buscarPorTelefono("3119876543")).isEmpty();
+    }
 }

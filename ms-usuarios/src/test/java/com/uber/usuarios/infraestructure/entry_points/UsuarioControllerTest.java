@@ -129,6 +129,15 @@ class UsuarioControllerTest {
     }
 
     @Test
+    void buscarPorTelefono_devuelveLosUsuariosQueCoinciden() throws Exception {
+        when(crudUseCase.buscarPorTelefono("573001234567")).thenReturn(List.of(usuario()));
+
+        mockMvc.perform(get("/api/v1/usuarios/buscar-por-telefono").param("telefono", "573001234567"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].email").value("ana@correo.com"));
+    }
+
+    @Test
     void listar_devuelve200() throws Exception {
         when(crudUseCase.listar()).thenReturn(List.of(usuario()));
 

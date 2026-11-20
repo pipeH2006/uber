@@ -22,6 +22,8 @@ public class UsuarioCrudUseCase {
     private final UsuarioGateway usuarioGateway;
     private final PasswordEncoder passwordEncoder;
 
+    private static final int MIN_DIGITOS_TELEFONO = 7;
+
     public Usuario registrar(Usuario usuario) {
         if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
             throw new IllegalArgumentException("El email es obligatorio");
@@ -75,5 +77,29 @@ public class UsuarioCrudUseCase {
             throw new UsuarioNoEncontradoException(id);
         }
         usuarioGateway.eliminar(id);
+    }
+
+    /**
+     * Usuarios cuyo teléfono coincide con el dado, ignorando espacios, signos y el indicativo del país
+     * (p. ej. «573001234567» coincide con «300 123 4567»). Pueden ser varios si una misma persona se
+     * registró con más de un rol.
+     */
+    public List<Usuario> buscarPorTelefono(String telefono) {
+        String buscado = soloDigitos(telefono);
+        if (buscado.length() < MIN_DIGITOS_TELEFONO) {
+            return List.of();
+        }
+        return usuarioGateway.listar().stream()
+                .filter(u -> coincide(buscado, soloDigitos(u.getTelefono())))
+                .toList();
+    }
+
+    private static boolean coincide(String buscado, String guardado) {
+        return guardado.length() >= MIN_DIGITOS_TELEFONO
+                && (buscado.endsWith(guardado) || guardado.endsWith(buscado));
+    }
+
+    private static String soloDigitos(String telefono) {
+        return telefono == null ? "" : telefono.replaceAll("\\D", "");
     }
 }

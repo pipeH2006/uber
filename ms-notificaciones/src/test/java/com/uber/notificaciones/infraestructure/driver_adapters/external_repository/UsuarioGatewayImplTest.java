@@ -63,4 +63,40 @@ class UsuarioGatewayImplTest {
         assertThatThrownBy(() -> new UsuarioGatewayImpl(RestClient.builder().build(), null).vincularTelegram(7L, "555"))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void vincularPorTelefono_vinculaATodosLosUsuariosQueCoinciden() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json")
+                .setBody("[{\"id\":7},{\"id\":8}]"));
+        server.enqueue(new MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json").setBody("{}"));
+        server.enqueue(new MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json").setBody("{}"));
+
+        assertThat(gateway.vincularPorTelefono("+57 300", "555")).isEqualTo(2);
+
+        RecordedRequest busqueda = server.takeRequest();
+        assertThat(busqueda.getMethod()).isEqualTo("GET");
+        assertThat(busqueda.getPath()).startsWith("/api/v1/usuarios/buscar-por-telefono?telefono=");
+        assertThat(server.takeRequest().getPath()).isEqualTo("/api/v1/usuarios/7");
+        assertThat(server.takeRequest().getPath()).isEqualTo("/api/v1/usuarios/8");
+    }
+
+    @Test
+    void vincularPorTelefono_sinCoincidencias_devuelveCero() {
+        server.enqueue(new MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json").setBody("[]"));
+
+        assertThat(gateway.vincularPorTelefono("3001234567", "555")).isZero();
+    }
+
+    @Test
+    void vincularPorTelefono_cuerpoVacio_devuelveCero() {
+        server.enqueue(new MockResponse().setResponseCode(200));
+
+        assertThat(gateway.vincularPorTelefono("3001234567", "555")).isZero();
+    }
+
+    @Test
+    void vincularPorTelefono_urlSinConfigurar_lanzaIllegalState() {
+        assertThatThrownBy(() -> new UsuarioGatewayImpl(RestClient.builder().build(), "").vincularPorTelefono("300", "555"))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
