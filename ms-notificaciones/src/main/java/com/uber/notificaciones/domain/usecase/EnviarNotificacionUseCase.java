@@ -5,6 +5,7 @@ import com.uber.notificaciones.domain.model.EstadoNotificacion;
 import com.uber.notificaciones.domain.model.Notificacion;
 import com.uber.notificaciones.domain.model.TipoNotificacion;
 import com.uber.notificaciones.domain.model.gateway.NotificacionGateway;
+import com.uber.notificaciones.domain.model.gateway.RedactorGateway;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -15,6 +16,12 @@ public class EnviarNotificacionUseCase {
 
     private final NotificacionGateway notificacionGateway;
     private final NotificacionSender sender;
+    private final RedactorGateway redactorGateway;
+
+    /** Igual que {@link #enviar}, pero el mensaje lo redacta la IA (con respaldo al texto original). */
+    public Notificacion enviarConIa(String destinatario, String mensaje, TipoNotificacion tipo) {
+        return enviar(destinatario, redactorGateway.redactar(mensaje), tipo);
+    }
 
     public Notificacion enviar(String destinatario, String mensaje, TipoNotificacion tipo) {
         Notificacion notificacion = Notificacion.builder()

@@ -81,7 +81,7 @@ public class NotificacionController {
     @PostMapping("/notificaciones/enviar")
     public ResponseEntity<NotificacionResponse> enviar(@Valid @RequestBody EnviarRequest request) {
         return ResponseEntity.ok(NotificacionResponse.from(
-                enviarUseCase.enviar(request.destinatario(), request.mensaje(), request.tipo())));
+                enviarUseCase.enviarConIa(request.destinatario(), request.mensaje(), request.tipo())));
     }
 
     @PostMapping("/notificaciones/enviar-masivo")

@@ -169,7 +169,7 @@ class NotificacionControllerTest {
 
     @Test
     void enviar_devuelve200() throws Exception {
-        when(enviarUseCase.enviar(eq("123456"), eq("Hola"), any())).thenReturn(notificacion());
+        when(enviarUseCase.enviarConIa(eq("123456"), eq("Hola"), any())).thenReturn(notificacion());
 
         mockMvc.perform(post("/api/v1/notificaciones/enviar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,7 +180,7 @@ class NotificacionControllerTest {
 
     @Test
     void enviar_falla_devuelve502() throws Exception {
-        when(enviarUseCase.enviar(anyString(), anyString(), any()))
+        when(enviarUseCase.enviarConIa(anyString(), anyString(), any()))
                 .thenThrow(new EnvioNotificacionException("Error de Telegram"));
 
         mockMvc.perform(post("/api/v1/notificaciones/enviar")

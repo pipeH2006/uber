@@ -5,6 +5,7 @@ import com.uber.notificaciones.domain.model.EstadoNotificacion;
 import com.uber.notificaciones.domain.model.Notificacion;
 import com.uber.notificaciones.domain.model.TipoNotificacion;
 import com.uber.notificaciones.domain.model.gateway.NotificacionGateway;
+import com.uber.notificaciones.domain.model.gateway.RedactorGateway;
 import com.uber.notificaciones.domain.model.gateway.TelegramGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,15 @@ class EnviarNotificacionUseCaseTest {
     @Mock
     private TelegramGateway telegramGateway;
 
+    @Mock
+    private RedactorGateway redactorGateway;
+
     private EnviarNotificacionUseCase useCase;
 
     @BeforeEach
     void setUp() {
         NotificacionSender sender = new NotificacionSender(notificacionGateway, telegramGateway);
-        useCase = new EnviarNotificacionUseCase(notificacionGateway, sender);
+        useCase = new EnviarNotificacionUseCase(notificacionGateway, sender, redactorGateway);
     }
 
     @Test
@@ -63,5 +67,16 @@ class EnviarNotificacionUseCaseTest {
         verify(notificacionGateway, times(2)).guardar(captor.capture());
         assertThat(captor.getAllValues().get(1).getEstado()).isEqualTo(EstadoNotificacion.FALLIDA);
         assertThat(captor.getAllValues().get(1).getIntentos()).isEqualTo(1);
+    }
+
+    @Test
+    void enviarConIa_envíaElMensajeRedactadoPorLaIa() {
+        when(redactorGateway.redactar("Tu viaje ha finalizado")).thenReturn("🚗 ¡Llegaste! Tu viaje ha finalizado.");
+        when(notificacionGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Notificacion resultado = useCase.enviarConIa("123456", "Tu viaje ha finalizado", TipoNotificacion.GENERICO);
+
+        assertThat(resultado.getMensaje()).isEqualTo("🚗 ¡Llegaste! Tu viaje ha finalizado.");
+        verify(telegramGateway).enviar("123456", "🚗 ¡Llegaste! Tu viaje ha finalizado.");
     }
 }

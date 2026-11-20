@@ -15,4 +15,10 @@ public class ExternalProperties {
     private String telegramBotToken = "";
 
     private String telegramBaseUrl = "https://api.telegram.org";
+
+    private String groqApiKey = "";
+
+    private String groqBaseUrl = "https://api.groq.com/openai";
+
+    private String usuariosUrl = "";
 }
