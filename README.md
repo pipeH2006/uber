@@ -240,10 +240,10 @@ Ver `.env.example`. Las más importantes:
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | todos | Conexión PostgreSQL (acepta `jdbc:postgresql://...` o `postgres://...`) |
 | `PORT` | todos | Puerto del microservicio |
 | `OSRM_BASE_URL` | viajes | URL base de OSRM (opcional) |
-| `GROQ_API_KEY` | pagos | Clave de Groq (gratis) |
 | `TELEGRAM_BOT_TOKEN` | notificaciones | Token del bot de Telegram |
 | `NOTIFICACIONES_URL` | viajes, pagos | URL de `ms-notificaciones` (para notificar eventos) |
-| `USUARIOS_URL` | viajes, pagos | URL de `ms-usuarios` (para resolver el `telegramChatId` del destinatario) |
+| `USUARIOS_URL` | viajes, pagos, notificaciones | URL de `ms-usuarios` (viajes/pagos resuelven el `telegramChatId`; notificaciones guarda el chat al vincular) |
+| `GROQ_API_KEY` | pagos, notificaciones | Groq: fraude en pagos y redacción de mensajes en notificaciones |
 
 ---
 
