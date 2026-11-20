@@ -39,17 +39,21 @@ class OsrmGatewayImplTest {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .addHeader("Content-Type", "application/json")
-                .setBody("{\"code\":\"Ok\",\"routes\":[{\"distance\":12500.0,\"duration\":900.0}]}"));
+                .setBody("{\"code\":\"Ok\",\"routes\":[{\"distance\":12500.0,\"duration\":900.0,"
+                        + "\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-74.07,4.71],[-74.075,4.65],[-74.08,4.6]]}}]}"));
 
         Ruta ruta = gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08));
 
         assertThat(ruta.distanciaKm()).isEqualTo(12.5);
         assertThat(ruta.duracionMin()).isEqualTo(15.0);
+        // GeoJSON [lng, lat] -> Coordenada(lat, lng)
+        assertThat(ruta.puntos()).containsExactly(
+                new Coordenada(4.71, -74.07), new Coordenada(4.65, -74.075), new Coordenada(4.6, -74.08));
 
         RecordedRequest request = mockWebServer.takeRequest();
         assertThat(request.getPath()).startsWith("/route/v1/driving/");
         assertThat(request.getPath()).contains("-74.07,4.71;-74.08,4.6");
-        assertThat(request.getPath()).contains("overview=false");
+        assertThat(request.getPath()).contains("overview=full").contains("geometries=geojson");
     }
 
     @Test
@@ -62,5 +66,18 @@ class OsrmGatewayImplTest {
 
         assertThatThrownBy(() -> gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08)))
                 .isInstanceOf(ErrorExternoException.class);
+    }
+
+    @Test
+    void calcularRuta_sinGeometria_devuelveTrazadoVacio() {
+        OsrmGatewayImpl gateway = new OsrmGatewayImpl(restClient);
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .addHeader("Content-Type", "application/json")
+                .setBody("{\"code\":\"Ok\",\"routes\":[{\"distance\":1000.0,\"duration\":60.0}]}"));
+
+        Ruta ruta = gateway.calcularRuta(new Coordenada(4.71, -74.07), new Coordenada(4.60, -74.08));
+
+        assertThat(ruta.puntos()).isEmpty();
     }
 }

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -72,5 +73,16 @@ class EstimarViajeUseCaseTest {
 
         assertThatThrownBy(() -> useCase.estimar(origen, destino))
                 .isInstanceOf(ErrorExternoException.class);
+    }
+
+    @Test
+    void estimar_incluyeElTrazadoDeLaRuta() {
+        Coordenada origen = new Coordenada(4.71, -74.07);
+        Coordenada destino = new Coordenada(4.60, -74.08);
+        List<Coordenada> trazado = List.of(origen, new Coordenada(4.65, -74.075), destino);
+        when(rutasGateway.calcularRuta(origen, destino)).thenReturn(new Ruta(10.0, 20.0, trazado));
+        when(tipoCambioGateway.obtenerTipoCambio("COP")).thenReturn(new BigDecimal("4000"));
+
+        assertThat(useCase.estimar(origen, destino).ruta()).isEqualTo(trazado);
     }
 }

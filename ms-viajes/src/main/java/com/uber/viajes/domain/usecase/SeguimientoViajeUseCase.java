@@ -28,6 +28,7 @@ public class SeguimientoViajeUseCase {
                 viaje.getEstado(),
                 ruta.distanciaKm(),
                 ruta.duracionMin(),
-                viaje.getCostoEstimado());
+                viaje.getCostoEstimado(),
+                ruta.puntos());
     }
 }

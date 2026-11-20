@@ -198,8 +198,13 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
         {yo && !activo && (
           <section className="bloque">
             <h2>Pedir un viaje</h2>
-            <p className="ayuda">Toca el mapa: primero el origen (verde) y luego el destino (rojo).</p>
-            <MapPicker origen={origen} destino={destino} onPick={elegirPunto} />
+            <p className="ayuda">Toca el mapa: primero el origen (verde) y luego el destino (rojo). Al estimar verás la ruta por calles.</p>
+            <MapPicker
+              origen={origen}
+              destino={destino}
+              ruta={estimacion ? (estimacion.ruta || []).map((p) => [p.lat, p.lng]) : null}
+              onPick={elegirPunto}
+            />
 
             <div className="fila">
               <button type="button" className="secundario" onClick={estimar} disabled={cargando || !origen || !destino}>

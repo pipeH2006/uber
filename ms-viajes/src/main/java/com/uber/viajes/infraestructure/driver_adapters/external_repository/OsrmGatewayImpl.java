@@ -8,6 +8,9 @@ import com.uber.viajes.domain.model.gateway.RutasGateway;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Adaptador del gateway de rutas usando OSRM (Open Source Routing Machine),
  * un motor de enrutamiento open source basado en OpenStreetMap.
@@ -30,7 +33,7 @@ public class OsrmGatewayImpl implements RutasGateway {
         // OSRM usa el orden (longitud,latitud)
         String coordenadas = origen.lng() + "," + origen.lat()
                 + ";" + destino.lng() + "," + destino.lat();
-        String path = RUTA_DRIVING + "/" + coordenadas + "?overview=false";
+        String path = RUTA_DRIVING + "/" + coordenadas + "?overview=full&geometries=geojson";
 
         JsonNode root = restClient.get()
                 .uri(path)
@@ -44,6 +47,15 @@ public class OsrmGatewayImpl implements RutasGateway {
 
         double metros = root.path("routes").path(0).path("distance").asDouble();
         double segundos = root.path("routes").path(0).path("duration").asDouble();
-        return new Ruta(metros / 1000.0, segundos / 60.0);
+        return new Ruta(metros / 1000.0, segundos / 60.0, trazado(root.path("routes").path(0).path("geometry")));
+    }
+
+    /** GeoJSON usa [longitud, latitud]; el dominio usa (latitud, longitud). */
+    private static List<Coordenada> trazado(JsonNode geometry) {
+        List<Coordenada> puntos = new ArrayList<>();
+        for (JsonNode punto : geometry.path("coordinates")) {
+            puntos.add(new Coordenada(punto.path(1).asDouble(), punto.path(0).asDouble()));
+        }
+        return puntos;
     }
 }

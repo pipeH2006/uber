@@ -25,7 +25,7 @@ public class EstimarViajeUseCase {
         BigDecimal costoUSD = calcularCostoUSD(ruta.distanciaKm(), ruta.duracionMin());
         BigDecimal tipoCambio = tipoCambioGateway.obtenerTipoCambio("COP");
         BigDecimal costoCOP = costoUSD.multiply(tipoCambio).setScale(2, RoundingMode.HALF_UP);
-        return new Estimacion(ruta.distanciaKm(), ruta.duracionMin(), costoUSD, costoCOP, tipoCambio);
+        return new Estimacion(ruta.distanciaKm(), ruta.duracionMin(), costoUSD, costoCOP, tipoCambio, ruta.puntos());
     }
 
     private BigDecimal calcularCostoUSD(double distanciaKm, double duracionMin) {

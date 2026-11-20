@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, CircleMarker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Polyline, useMapEvents } from 'react-leaflet';
 
 function ClickCatcher({ onPick }) {
   useMapEvents({
@@ -9,7 +9,7 @@ function ClickCatcher({ onPick }) {
   return null;
 }
 
-export default function MapPicker({ origen, destino, onPick, altura = 300 }) {
+export default function MapPicker({ origen, destino, ruta, onPick, altura = 300 }) {
   const center = origen || { lat: 4.711, lng: -74.0721 };
 
   return (
@@ -24,6 +24,9 @@ export default function MapPicker({ origen, destino, onPick, altura = 300 }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ClickCatcher onPick={onPick} />
+      {ruta && ruta.length > 1 && (
+        <Polyline positions={ruta} pathOptions={{ color: '#2563eb', weight: 5, opacity: 0.85 }} />
+      )}
       {origen && (
         <CircleMarker
           center={[origen.lat, origen.lng]}
