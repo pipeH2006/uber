@@ -6,12 +6,19 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+/**
+ * Envía la notificación a ms-notificaciones sin bloquear al llamador: el mensaje lo redacta la IA y
+ * se entrega por Telegram, lo que puede tardar varios segundos y no debe retrasar el viaje o el pago.
+ */
 @Slf4j
 public class NotificacionRestGatewayImpl implements NotificacionGateway {
 
     private final RestClient restClient;
     private final String notificacionesUrl;
+    private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 
     public NotificacionRestGatewayImpl(RestClient restClient, String notificacionesUrl) {
         this.restClient = restClient;
@@ -24,6 +31,10 @@ public class NotificacionRestGatewayImpl implements NotificacionGateway {
             log.warn("URL de notificaciones no configurada; se omite el envío");
             return;
         }
+        executor.execute(() -> enviar(destinatario, mensaje));
+    }
+
+    private void enviar(String destinatario, String mensaje) {
         try {
             restClient.post()
                     .uri("api/v1/notificaciones/enviar")

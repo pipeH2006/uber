@@ -109,4 +109,23 @@ class SolicitarViajeUseCaseTest {
 
         verifyNoInteractions(estimarViajeUseCase, viajeGateway, notificacionGateway);
     }
+
+    @Test
+    void solicitar_pasajeroConChat_tambienLoNotificaQueElViajeFueAsignado() {
+        Coordenada origen = new Coordenada(4.71, -74.07);
+        Coordenada destino = new Coordenada(4.60, -74.08);
+        when(estimarViajeUseCase.estimar(origen, destino)).thenReturn(new Estimacion(
+                10.0, 20.0, new BigDecimal("13.50"), new BigDecimal("54000.00"), new BigDecimal("4000")));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> {
+            Viaje v = inv.getArgument(0);
+            v.setId(5L);
+            return v;
+        });
+        when(usuarioGateway.obtenerChatIdTelegram(1L)).thenReturn(Optional.of("111"));
+        when(usuarioGateway.obtenerChatIdTelegram(2L)).thenReturn(Optional.empty());
+
+        useCase.solicitar(1L, 2L, origen, destino);
+
+        verify(notificacionGateway).notificar("111", "Tu viaje #5 fue asignado a un conductor y va en camino");
+    }
 }

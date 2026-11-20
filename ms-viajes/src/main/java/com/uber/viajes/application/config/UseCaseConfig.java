@@ -42,8 +42,10 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public IniciarViajeUseCase iniciarViajeUseCase(ViajeGateway viajeGateway) {
-        return new IniciarViajeUseCase(viajeGateway);
+    public IniciarViajeUseCase iniciarViajeUseCase(ViajeGateway viajeGateway,
+                                                   NotificacionGateway notificacionGateway,
+                                                   UsuarioGateway usuarioGateway) {
+        return new IniciarViajeUseCase(viajeGateway, notificacionGateway, usuarioGateway);
     }
 
     @Bean
@@ -54,8 +56,10 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public CancelarViajeUseCase cancelarViajeUseCase(ViajeGateway viajeGateway) {
-        return new CancelarViajeUseCase(viajeGateway);
+    public CancelarViajeUseCase cancelarViajeUseCase(ViajeGateway viajeGateway,
+                                                     NotificacionGateway notificacionGateway,
+                                                     UsuarioGateway usuarioGateway) {
+        return new CancelarViajeUseCase(viajeGateway, notificacionGateway, usuarioGateway);
     }
 
     @Bean

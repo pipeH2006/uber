@@ -4,6 +4,8 @@ import com.uber.viajes.domain.exception.EstadoViajeInvalidoException;
 import com.uber.viajes.domain.exception.ViajeNoEncontradoException;
 import com.uber.viajes.domain.model.EstadoViaje;
 import com.uber.viajes.domain.model.Viaje;
+import com.uber.viajes.domain.model.gateway.NotificacionGateway;
+import com.uber.viajes.domain.model.gateway.UsuarioGateway;
 import com.uber.viajes.domain.model.gateway.ViajeGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,11 +28,17 @@ class CancelarViajeUseCaseTest {
     @Mock
     private ViajeGateway viajeGateway;
 
+    @Mock
+    private NotificacionGateway notificacionGateway;
+
+    @Mock
+    private UsuarioGateway usuarioGateway;
+
     private CancelarViajeUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new CancelarViajeUseCase(viajeGateway);
+        useCase = new CancelarViajeUseCase(viajeGateway, notificacionGateway, usuarioGateway);
     }
 
     @Test
@@ -40,6 +50,32 @@ class CancelarViajeUseCaseTest {
         Viaje resultado = useCase.cancelar(1L);
 
         assertThat(resultado.getEstado()).isEqualTo(EstadoViaje.CANCELADO);
+    }
+
+    @Test
+    void cancelar_conChats_avisaAlPasajeroYAlConductor() {
+        Viaje v = Viaje.builder().id(1L).pasajeroId(7L).conductorId(8L).estado(EstadoViaje.ASIGNADO).build();
+        when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(7L)).thenReturn(Optional.of("777"));
+        when(usuarioGateway.obtenerChatIdTelegram(8L)).thenReturn(Optional.of("888"));
+
+        useCase.cancelar(1L);
+
+        verify(notificacionGateway).notificar("777", "Tu viaje fue cancelado");
+        verify(notificacionGateway).notificar("888", "El viaje que tenías asignado fue cancelado");
+    }
+
+    @Test
+    void cancelar_sinConductorNiChats_noNotifica() {
+        Viaje v = Viaje.builder().id(1L).pasajeroId(7L).estado(EstadoViaje.SOLICITADO).build();
+        when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
+        when(viajeGateway.guardar(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(usuarioGateway.obtenerChatIdTelegram(7L)).thenReturn(Optional.empty());
+
+        useCase.cancelar(1L);
+
+        verifyNoInteractions(notificacionGateway);
     }
 
     @Test

@@ -46,6 +46,9 @@ public class SolicitarViajeUseCase {
         Viaje guardado = viajeGateway.guardar(viaje);
         usuarioGateway.obtenerChatIdTelegram(conductorId)
                 .ifPresent(chatId -> notificacionGateway.notificar(chatId, "Se te ha asignado un nuevo viaje"));
+        usuarioGateway.obtenerChatIdTelegram(pasajeroId)
+                .ifPresent(chatId -> notificacionGateway.notificar(chatId,
+                        "Tu viaje #" + guardado.getId() + " fue asignado a un conductor y va en camino"));
         return guardado;
     }
 
