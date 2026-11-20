@@ -33,6 +33,8 @@ export const options = {
   thresholds: {
     // En estrés toleramos algo más de errores, pero no colapso total.
     'http_req_failed{fase:medicion}': ['rate<0.10'],
+    // Informativo: no corta la prueba, solo marca desde dónde el servicio se degrada.
+    'http_req_duration{fase:medicion}': [{ threshold: 'p(95)<2000', abortOnFail: false }],
   },
 };
 
@@ -41,24 +43,16 @@ export function setup() {
 }
 
 export default function () {
-  const estimar = http.post(
-    `${BASE_VIAJES}/api/v1/viajes/estimar`,
-    JSON.stringify({
-      origenLat: 4.7110,
-      origenLng: -74.0721,
-      origenDireccion: 'Centro, Bogota',
-      destinoLat: 4.6533,
-      destinoLng: -74.0836,
-      destinoDireccion: 'Chapinero, Bogota',
-    }),
-    { headers: { 'Content-Type': 'application/json' }, tags: TAGS_MEDICION },
-  );
-
+  // Solo endpoints propios (base de datos y caché), sin llamar a OSRM ni a la API de dólar en cada
+  // iteración: el servidor público de OSRM es de demostración y no tolera cientos de peticiones/s.
   const salud = http.get(`${BASE_VIAJES}/actuator/health`, { tags: TAGS_MEDICION });
+  const usuarios = http.get(`${BASE_USUARIOS}/api/v1/usuarios`, { tags: TAGS_MEDICION });
+  const plantillas = http.get(`${BASE_NOTIF}/api/v1/notificaciones/plantillas`, { tags: TAGS_MEDICION });
   const tipoCambio = http.get(`${BASE_PAGOS}/api/v1/pagos/tipo-cambio?moneda=COP`, { tags: TAGS_MEDICION });
 
-  check(estimar, { 'estimar 200': (r) => r.status === 200 });
   check(salud, { 'health 200': (r) => r.status === 200 });
+  check(usuarios, { 'usuarios 200': (r) => r.status === 200 });
+  check(plantillas, { 'plantillas 200': (r) => r.status === 200 });
   check(tipoCambio, { 'tipo-cambio 200': (r) => r.status === 200 });
 
   sleep(0.5);
