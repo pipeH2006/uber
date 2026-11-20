@@ -1,0 +1,2759 @@
+{
+  "info": {
+    "name": "Uber - Microservicios",
+    "description": "Colección de pruebas de los 4 microservicios (usuarios, viajes, pagos, notificaciones). Por defecto apunta a Render; para local importa el entorno \"Uber - Local\". Cambia la variable chatId por tu chat de Telegram para recibir los avisos reales. Ejecuta 0 y 1 en orden con el Collection Runner; 2 y 3 dependen de los ids del flujo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Salud (los 4 servicios)",
+      "item": [
+        {
+          "name": "Usuarios - health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUsuarios}}/actuator/health",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Viajes - health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseViajes}}/actuator/health",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pagos - health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{basePagos}}/actuator/health",
+              "host": [
+                "{{basePagos}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notificaciones - health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseNotif}}/actuator/health",
+              "host": [
+                "{{baseNotif}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "En Render free el primer request puede tardar hasta ~1 minuto (arranque en frío). Ejecuta esta carpeta primero."
+    },
+    {
+      "name": "1. Flujo completo (ejecutar en orden)",
+      "item": [
+        {
+          "name": "Usuarios",
+          "item": [
+            {
+              "name": "1.01 Registrar pasajero",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios"
+                  ]
+                },
+                "description": "Crea el pasajero y guarda pasajeroId. Cambia la variable chatId por tu chat real para recibir los avisos en Telegram.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Ana Pasajera\",\n  \"email\": \"pasajero{{$timestamp}}@correo.com\",\n  \"telefono\": \"{{telefono}}\",\n  \"contrasena\": \"{{password}}\",\n  \"rol\": \"PASAJERO\",\n  \"telegramChatId\": \"{{chatId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"pasajeroId\", j.id);",
+                      "pm.collectionVariables.set(\"pasajeroEmail\", pm.response.json().email);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.02 Registrar conductor",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Beto Conductor\",\n  \"email\": \"conductor{{$timestamp}}@correo.com\",\n  \"contrasena\": \"{{password}}\",\n  \"rol\": \"CONDUCTOR\",\n  \"telegramChatId\": \"{{chatId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"conductorId\", j.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.03 Login del pasajero",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/auth/login",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{pasajeroEmail}}\",\n  \"contrasena\": \"{{password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.04 Activar pasajero",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{pasajeroId}}/activar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{pasajeroId}}",
+                    "activar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Queda ACTIVO\", () => pm.expect(pm.response.json().estado).to.eql(\"ACTIVO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.05 Activar conductor",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/activar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "activar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.06 Verificar documento del conductor",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/verificar-documento",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "verificar-documento"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Documento VERIFICADO\", () => pm.expect(pm.response.json().estadoDocumento).to.eql(\"VERIFICADO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.07 Buscar usuarios por teléfono",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/buscar-por-telefono?telefono={{telefono}}",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "buscar-por-telefono"
+                  ],
+                  "query": [
+                    {
+                      "key": "telefono",
+                      "value": "{{telefono}}"
+                    }
+                  ]
+                },
+                "description": "Ignora espacios, signos e indicativo de país: prueba también con 573001234567."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Encuentra al pasajero\", () => pm.expect(pm.response.json().length).to.be.above(0));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Viajes",
+          "item": [
+            {
+              "name": "1.08 Estimar tarifa (OSRM + dólar)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/estimar",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "estimar"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"origenLat\": 4.711,\n  \"origenLng\": -74.0721,\n  \"destinoLat\": 4.6533,\n  \"destinoLng\": -74.0836\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Trae costoUSD\", () => pm.expect(pm.response.json().costoUSD).to.exist);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.09 Solicitar viaje (asigna conductor)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/solicitar",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "solicitar"
+                  ]
+                },
+                "description": "Valida que pasajero y conductor existan (404 si no) y notifica a ambos por Telegram.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pasajeroId\": \"{{pasajeroId}}\",\n  \"conductorId\": \"{{conductorId}}\",\n  \"origenLat\": 4.711,\n  \"origenLng\": -74.0721,\n  \"origenDireccion\": \"Centro, Bogotá\",\n  \"destinoLat\": 4.6533,\n  \"destinoLng\": -74.0836,\n  \"destinoDireccion\": \"Chapinero, Bogotá\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"viajeId\", j.id);",
+                      "pm.test(\"Estado ASIGNADO\", () => pm.expect(j.estado).to.eql(\"ASIGNADO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.10 Seguimiento (estado + ETA)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/seguimiento",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{viajeId}}",
+                    "seguimiento"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.11 Iniciar viaje",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/iniciar",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{viajeId}}",
+                    "iniciar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Estado EN_CURSO\", () => pm.expect(pm.response.json().estado).to.eql(\"EN_CURSO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.12 Cancelar viaje en curso (debe fallar)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/cancelar",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{viajeId}}",
+                    "cancelar"
+                  ]
+                },
+                "description": "Regla: no se puede cancelar una vez que el conductor inicia el viaje."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.13 Finalizar viaje",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/finalizar",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{viajeId}}",
+                    "finalizar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Estado FINALIZADO\", () => pm.expect(pm.response.json().estado).to.eql(\"FINALIZADO\"));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Pagos",
+          "item": [
+            {
+              "name": "1.14 Procesar pago",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/procesar",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "procesar"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"viajeId\": \"{{viajeId}}\",\n  \"usuarioId\": \"{{pasajeroId}}\",\n  \"monto\": 11.31,\n  \"moneda\": \"USD\",\n  \"metodoPago\": \"TARJETA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"pagoId\", j.id);",
+                      "pm.test(\"Pago APROBADO\", () => pm.expect(j.estado).to.eql(\"APROBADO\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.15 Evaluar fraude (Groq)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{pagoId}}/evaluar-fraude",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{pagoId}}",
+                    "evaluar-fraude"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Riesgo BAJO/MEDIO/ALTO\", () => pm.expect([\"BAJO\",\"MEDIO\",\"ALTO\"]).to.include(pm.response.json().riesgo));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.16 Factura (USD → COP)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{pagoId}}/factura",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{pagoId}}",
+                    "factura"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.17 Tipo de cambio actual",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/tipo-cambio?moneda=COP",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "tipo-cambio"
+                  ],
+                  "query": [
+                    {
+                      "key": "moneda",
+                      "value": "COP"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.18 Resumen de ingresos del día",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/resumen?fecha={{hoy}}",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "resumen"
+                  ],
+                  "query": [
+                    {
+                      "key": "fecha",
+                      "value": "{{hoy}}"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.collectionVariables.set(\"hoy\", new Date().toISOString().slice(0, 10));"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.19 Reembolsar pago",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{pagoId}}/reembolsar",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{pagoId}}",
+                    "reembolsar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Pago REEMBOLSADO\", () => pm.expect(pm.response.json().estado).to.eql(\"REEMBOLSADO\"));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Calificaciones",
+          "item": [
+            {
+              "name": "1.20 Calificar al conductor",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/calificar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "calificar"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"calificadorId\": \"{{pasajeroId}}\",\n  \"puntaje\": 5,\n  \"comentario\": \"Excelente viaje\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.21 Calificación promedio del conductor",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/calificacion-promedio",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{conductorId}}",
+                    "calificacion-promedio"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Promedio entre 1 y 5\", () => pm.expect(pm.response.json().promedio).to.be.within(1, 5));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Notificaciones",
+          "item": [
+            {
+              "name": "1.22 Notificaciones generadas por el flujo",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones"
+                  ]
+                },
+                "description": "Si chatId es tu chat real, verás ENVIADA y recibirás los mensajes (redactados por Groq si hay clave). Con un chat falso quedan FALLIDA."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Hay notificaciones\", () => pm.expect(pm.response.json().length).to.be.above(0));",
+                      "const ultima = pm.response.json().slice(-1)[0];",
+                      "if (ultima) pm.collectionVariables.set(\"notifId\", ultima.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.23 Enviar notificación manual (con IA)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/enviar",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "enviar"
+                  ]
+                },
+                "description": "200 si el chat existe; 502 si Telegram rechaza un chat falso.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"destinatario\": \"{{chatId}}\",\n  \"mensaje\": \"Tu viaje ha finalizado\",\n  \"tipo\": \"VIAJE_FINALIZADO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 502\", () => pm.expect(pm.response.code).to.be.oneOf([200, 502]));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.24 Estado de una notificación",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/{{notifId}}/estado",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "{{notifId}}",
+                    "estado"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.25 Reintentar una notificación",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/{{notifId}}/reintentar",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "{{notifId}}",
+                    "reintentar"
+                  ]
+                },
+                "description": "409 si ya estaba ENVIADA; 502 si vuelve a fallar."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 409 o 502\", () => pm.expect(pm.response.code).to.be.oneOf([200, 409, 502]));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.26 Envío masivo",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/enviar-masivo",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "enviar-masivo"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"destinatarios\": [\n    \"{{chatId}}\",\n    \"{{chatId}}\"\n  ],\n  \"mensaje\": \"Promoción de la semana\",\n  \"tipo\": \"GENERICO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 502\", () => pm.expect(pm.response.code).to.be.oneOf([200, 502]));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.27 Listar plantillas",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/plantillas",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "plantillas"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Incluye BIENVENIDA\", () => pm.expect(pm.response.json().map(p => p.codigo)).to.include(\"BIENVENIDA\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "1.28 Enviar con plantilla",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/enviar-con-plantilla",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "enviar-con-plantilla"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"codigo\": \"BIENVENIDA\",\n  \"destinatario\": \"{{chatId}}\",\n  \"variables\": {\n    \"nombre\": \"Ana\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 502\", () => pm.expect(pm.response.code).to.be.oneOf([200, 502]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "description": "Ejecuta con el Collection Runner de arriba abajo: cada paso guarda los ids que necesita el siguiente."
+    },
+    {
+      "name": "2. CRUD por servicio",
+      "item": [
+        {
+          "name": "Usuarios",
+          "item": [
+            {
+              "name": "Crear usuario",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Crud Usuario\",\n  \"email\": \"crud{{$timestamp}}@correo.com\",\n  \"telefono\": \"3112223344\",\n  \"contrasena\": \"{{password}}\",\n  \"rol\": \"PASAJERO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"crudUsuarioId\", j.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buscar por id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Listar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Actualizar",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Crud Usuario Editado\",\n  \"telefono\": \"3115556677\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                      "pm.test(\"Nombre actualizado\", () => pm.expect(pm.response.json().nombre).to.eql(\"Crud Usuario Editado\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Desactivar",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}/desactivar",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}",
+                    "desactivar"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Eliminar",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUsuarios}}/api/v1/usuarios/{{crudUsuarioId}}",
+                  "host": [
+                    "{{baseUsuarios}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "usuarios",
+                    "{{crudUsuarioId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 204\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Viajes",
+          "item": [
+            {
+              "name": "Crear viaje",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pasajeroId\": \"{{pasajeroId}}\",\n  \"conductorId\": \"{{conductorId}}\",\n  \"origenLat\": 4.711,\n  \"origenLng\": -74.072,\n  \"origenDireccion\": \"A\",\n  \"destinoLat\": 4.653,\n  \"destinoLng\": -74.083,\n  \"destinoDireccion\": \"B\",\n  \"distanciaKm\": 8.9,\n  \"duracionMin\": 11,\n  \"costoEstimado\": 11.31,\n  \"moneda\": \"USD\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"crudViajeId\", j.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buscar por id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{crudViajeId}}",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{crudViajeId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Listar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Actualizar",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{crudViajeId}}",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{crudViajeId}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"origenDireccion\": \"Origen editado\",\n  \"destinoDireccion\": \"Destino editado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Eliminar",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseViajes}}/api/v1/viajes/{{crudViajeId}}",
+                  "host": [
+                    "{{baseViajes}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "viajes",
+                    "{{crudViajeId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 204\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Pagos",
+          "item": [
+            {
+              "name": "Crear pago",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"viajeId\": \"{{viajeId}}\",\n  \"usuarioId\": \"{{pasajeroId}}\",\n  \"monto\": 20.5,\n  \"moneda\": \"USD\",\n  \"metodoPago\": \"EFECTIVO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"crudPagoId\", j.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buscar por id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{crudPagoId}}",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{crudPagoId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Listar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Actualizar",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{crudPagoId}}",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{crudPagoId}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"monto\": 25.0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Eliminar",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{basePagos}}/api/v1/pagos/{{crudPagoId}}",
+                  "host": [
+                    "{{basePagos}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "pagos",
+                    "{{crudPagoId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 204\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Notificaciones",
+          "item": [
+            {
+              "name": "Crear notificación",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"destinatario\": \"{{chatId}}\",\n  \"canal\": \"TELEGRAM\",\n  \"tipo\": \"GENERICO\",\n  \"mensaje\": \"Notificación de prueba\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                      "const j = pm.response.json();",
+                      "pm.test(\"Devuelve id\", () => pm.expect(j.id).to.exist);",
+                      "pm.collectionVariables.set(\"crudNotifId\", j.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buscar por id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/{{crudNotifId}}",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "{{crudNotifId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Listar",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Actualizar",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/{{crudNotifId}}",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "{{crudNotifId}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"destinatario\": \"{{chatId}}\",\n  \"mensaje\": \"Mensaje editado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Eliminar",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseNotif}}/api/v1/notificaciones/{{crudNotifId}}",
+                  "host": [
+                    "{{baseNotif}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "notificaciones",
+                    "{{crudNotifId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status 200 o 204\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "description": "Depende de haber corrido el flujo (usa pasajeroId, conductorId y viajeId)."
+    },
+    {
+      "name": "3. Casos de error",
+      "item": [
+        {
+          "name": "Registrar con body inválido → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"email\": \"no-es-email\",\n  \"contrasena\": \"123\",\n  \"rol\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar con chat de Telegram no numérico → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"email\": \"x{{$timestamp}}@correo.com\",\n  \"contrasena\": \"secreto123\",\n  \"rol\": \"PASAJERO\",\n  \"telegramChatId\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar con email duplicado → 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Duplicado\",\n  \"email\": \"{{pasajeroEmail}}\",\n  \"contrasena\": \"secreto123\",\n  \"rol\": \"PASAJERO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login con contraseña incorrecta → 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/auth/login",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{pasajeroEmail}}\",\n  \"contrasena\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401 o 400\", () => pm.expect(pm.response.code).to.be.oneOf([401, 400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuario inexistente → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios/999999",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calificar con puntaje fuera de rango → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUsuarios}}/api/v1/usuarios/{{conductorId}}/calificar",
+              "host": [
+                "{{baseUsuarios}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{conductorId}}",
+                "calificar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calificadorId\": \"{{pasajeroId}}\",\n  \"puntaje\": 9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estimar sin coordenadas → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/estimar",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "estimar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origenLng\": -74.07,\n  \"destinoLat\": 4.6,\n  \"destinoLng\": -74.08\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitar con pasajero inexistente → 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/solicitar",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "solicitar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pasajeroId\": 999999,\n  \"conductorId\": \"{{conductorId}}\",\n  \"origenLat\": 4.711,\n  \"origenLng\": -74.072,\n  \"destinoLat\": 4.653,\n  \"destinoLng\": -74.083\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Iniciar un viaje ya finalizado → 409",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/iniciar",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "{{viajeId}}",
+                "iniciar"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar un viaje ya finalizado → 409",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/{{viajeId}}/cancelar",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "{{viajeId}}",
+                "cancelar"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Viaje inexistente → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseViajes}}/api/v1/viajes/999999",
+              "host": [
+                "{{baseViajes}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "viajes",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Procesar pago con usuario inexistente → 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{basePagos}}/api/v1/pagos/procesar",
+              "host": [
+                "{{basePagos}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pagos",
+                "procesar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"viajeId\": \"{{viajeId}}\",\n  \"usuarioId\": 999999,\n  \"monto\": 5,\n  \"moneda\": \"USD\",\n  \"metodoPago\": \"TARJETA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Procesar pago con monto negativo → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{basePagos}}/api/v1/pagos/procesar",
+              "host": [
+                "{{basePagos}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pagos",
+                "procesar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"viajeId\": \"{{viajeId}}\",\n  \"usuarioId\": \"{{pasajeroId}}\",\n  \"monto\": -5,\n  \"metodoPago\": \"TARJETA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reembolsar un pago ya reembolsado → 409",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{basePagos}}/api/v1/pagos/{{pagoId}}/reembolsar",
+              "host": [
+                "{{basePagos}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pagos",
+                "{{pagoId}}",
+                "reembolsar"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pago inexistente → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{basePagos}}/api/v1/pagos/999999",
+              "host": [
+                "{{basePagos}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pagos",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enviar notificación sin mensaje → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseNotif}}/api/v1/notificaciones/enviar",
+              "host": [
+                "{{baseNotif}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificaciones",
+                "enviar"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destinatario\": \"{{chatId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Plantilla inexistente → 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseNotif}}/api/v1/notificaciones/enviar-con-plantilla",
+              "host": [
+                "{{baseNotif}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificaciones",
+                "enviar-con-plantilla"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"NO_EXISTE\",\n  \"destinatario\": \"{{chatId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notificación inexistente → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseNotif}}/api/v1/notificaciones/999999",
+              "host": [
+                "{{baseNotif}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificaciones",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUsuarios",
+      "value": "https://uber-ms-usuarios.onrender.com"
+    },
+    {
+      "key": "baseViajes",
+      "value": "https://uber-ms-viajes.onrender.com"
+    },
+    {
+      "key": "basePagos",
+      "value": "https://uber-ms-pagos.onrender.com"
+    },
+    {
+      "key": "baseNotif",
+      "value": "https://uber-ms-notificaciones.onrender.com"
+    },
+    {
+      "key": "chatId",
+      "value": "123456789"
+    },
+    {
+      "key": "password",
+      "value": "secreto123"
+    },
+    {
+      "key": "pasajeroId",
+      "value": ""
+    },
+    {
+      "key": "conductorId",
+      "value": ""
+    },
+    {
+      "key": "viajeId",
+      "value": ""
+    },
+    {
+      "key": "pagoId",
+      "value": ""
+    },
+    {
+      "key": "notifId",
+      "value": ""
+    },
+    {
+      "key": "pasajeroEmail",
+      "value": ""
+    },
+    {
+      "key": "telefono",
+      "value": "3001234567"
+    },
+    {
+      "key": "crudUsuarioId",
+      "value": ""
+    },
+    {
+      "key": "crudViajeId",
+      "value": ""
+    },
+    {
+      "key": "crudPagoId",
+      "value": ""
+    },
+    {
+      "key": "crudNotifId",
+      "value": ""
+    },
+    {
+      "key": "hoy",
+      "value": ""
+    }
+  ]
+}
