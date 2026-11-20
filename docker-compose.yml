@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     container_name: uber-postgres
     environment:
+      POSTGRES_DB: uber
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -20,7 +20,7 @@ services:
     build: ./ms-usuarios
     container_name: ms-usuarios
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/usuarios
+      DB_URL: jdbc:postgresql://postgres:5432/uber
       DB_USER: postgres
       DB_PASSWORD: postgres
       PORT: "8081"
@@ -34,7 +34,7 @@ services:
     build: ./ms-viajes
     container_name: ms-viajes
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/viajes
+      DB_URL: jdbc:postgresql://postgres:5432/uber
       DB_USER: postgres
       DB_PASSWORD: postgres
       PORT: "8082"
@@ -52,7 +52,7 @@ services:
     build: ./ms-pagos
     container_name: ms-pagos
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/pagos
+      DB_URL: jdbc:postgresql://postgres:5432/uber
       DB_USER: postgres
       DB_PASSWORD: postgres
       PORT: "8083"
@@ -70,7 +70,7 @@ services:
     build: ./ms-notificaciones
     container_name: ms-notificaciones
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/notificaciones
+      DB_URL: jdbc:postgresql://postgres:5432/uber
       DB_USER: postgres
       DB_PASSWORD: postgres
       PORT: "8084"

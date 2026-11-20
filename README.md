@@ -31,7 +31,7 @@ Proyecto académico de **arquitectura de microservicios** para un dominio de **t
         └───────────────┬─────────────────────────────┘
                         │  (JDBC)
                  ┌──────▼───────┐
-                 │  PostgreSQL  │  (1 BD por microservicio)
+                 │  PostgreSQL  │  (1 BD compartida: uber)
                  └──────────────┘
 ```
 
@@ -198,7 +198,7 @@ docker compose up --build
 
 ### Opción B — Maven (un microservicio a la vez)
 
-Requiere PostgreSQL corriendo en `localhost:5432` (con las 4 bases creadas, ver `db/init.sql`):
+Requiere PostgreSQL local en `localhost:5432` (sin Docker) con **una sola base `uber`** compartida por los 4 servicios. Créala desde pgAdmin (clic derecho en *Databases* > *Create* > *Database* > `uber`) o ejecutando `db/crear-bd-local.sql`. Si tu usuario/clave no son `postgres/postgres`, define `DB_USER` y `DB_PASSWORD`:
 
 ```bash
 cd ms-usuarios
