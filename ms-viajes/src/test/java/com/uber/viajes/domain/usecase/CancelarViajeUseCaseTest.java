@@ -88,6 +88,19 @@ class CancelarViajeUseCaseTest {
     }
 
     @Test
+    void cancelar_viajeEnCurso_lanzaExcepcionYNoNotifica() {
+        Viaje v = Viaje.builder().id(1L).pasajeroId(7L).conductorId(8L).estado(EstadoViaje.EN_CURSO).build();
+        when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));
+
+        assertThatThrownBy(() -> useCase.cancelar(1L))
+                .isInstanceOf(EstadoViajeInvalidoException.class)
+                .hasMessageContaining("EN_CURSO");
+
+        verifyNoInteractions(notificacionGateway);
+        assertThat(v.getEstado()).isEqualTo(EstadoViaje.EN_CURSO);
+    }
+
+    @Test
     void cancelar_yaCancelado_lanzaExcepcion() {
         Viaje v = Viaje.builder().id(1L).estado(EstadoViaje.CANCELADO).build();
         when(viajeGateway.buscarPorId(1L)).thenReturn(Optional.of(v));

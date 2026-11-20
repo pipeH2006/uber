@@ -148,9 +148,13 @@ export default function PanelPasajero({ usuarios, viajes, pagos, refrescar }) {
                 ? 'Esperando a que el conductor acepte y comience el viaje…'
                 : 'Tu conductor va en camino. El estado se actualiza solo.'}
             </p>
-            <button type="button" className="peligro" onClick={cancelar} disabled={cargando}>
-              Cancelar viaje
-            </button>
+            {activo.estado === 'ASIGNADO' ? (
+              <button type="button" className="peligro" onClick={cancelar} disabled={cargando}>
+                Cancelar viaje
+              </button>
+            ) : (
+              <p className="ayuda">El conductor ya inició el viaje: ya no se puede cancelar.</p>
+            )}
           </section>
         )}
 

@@ -120,7 +120,7 @@ com.uber.<servicio>
 | POST | `/viajes/solicitar` | Solicitar viaje y asignar conductor |
 | POST | `/viajes/{id}/iniciar` | Iniciar viaje |
 | POST | `/viajes/{id}/finalizar` | Finalizar viaje (calcula costo final) |
-| POST | `/viajes/{id}/cancelar` | Cancelar viaje |
+| POST | `/viajes/{id}/cancelar` | Cancelar viaje (solo antes de que el conductor lo inicie; en curso responde 409) |
 | GET | `/viajes/{id}/seguimiento` | Estado + ETA del viaje |
 
 ### `ms-pagos` (`/api/v1/pagos`)

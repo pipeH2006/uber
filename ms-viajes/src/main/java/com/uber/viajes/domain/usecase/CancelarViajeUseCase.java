@@ -20,7 +20,8 @@ public class CancelarViajeUseCase {
         Viaje viaje = viajeGateway.buscarPorId(id)
                 .orElseThrow(() -> new ViajeNoEncontradoException(id));
 
-        if (viaje.getEstado() == EstadoViaje.FINALIZADO || viaje.getEstado() == EstadoViaje.CANCELADO) {
+        // Solo se puede cancelar antes de que el conductor inicie el viaje.
+        if (viaje.getEstado() != EstadoViaje.SOLICITADO && viaje.getEstado() != EstadoViaje.ASIGNADO) {
             throw new EstadoViajeInvalidoException("No se puede cancelar un viaje en estado " + viaje.getEstado());
         }
         viaje.setEstado(EstadoViaje.CANCELADO);
