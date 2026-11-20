@@ -8,17 +8,12 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Agregado raíz del subdominio de notificaciones. Representa un mensaje
- * que se desea entregar a un destinatario a través de un {@link Canal}.
- */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notificacion {
-
     private Long id;
     private String destinatario;
     private Canal canal;

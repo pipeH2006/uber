@@ -6,12 +6,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-/**
- * Caso de uso para listar las plantillas disponibles.
- */
 @RequiredArgsConstructor
 public class ListarPlantillasUseCase {
-
     private final PlantillaGateway plantillaGateway;
 
     public List<Plantilla> listarPlantillas() {

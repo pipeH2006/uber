@@ -8,17 +8,12 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Agregado raíz del subdominio de usuarios. Representa tanto a un pasajero
- * como a un conductor (diferenciados por {@link Rol}).
- */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
-
     private Long id;
     private String nombre;
     private String email;

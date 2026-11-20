@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CancelarViajeUseCase {
-
     private final ViajeGateway viajeGateway;
     private final NotificacionGateway notificacionGateway;
     private final UsuarioGateway usuarioGateway;
@@ -20,7 +19,6 @@ public class CancelarViajeUseCase {
         Viaje viaje = viajeGateway.buscarPorId(id)
                 .orElseThrow(() -> new ViajeNoEncontradoException(id));
 
-        // Solo se puede cancelar antes de que el conductor inicie el viaje.
         if (viaje.getEstado() != EstadoViaje.SOLICITADO && viaje.getEstado() != EstadoViaje.ASIGNADO) {
             throw new EstadoViajeInvalidoException("No se puede cancelar un viaje en estado " + viaje.getEstado());
         }

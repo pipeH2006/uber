@@ -4,7 +4,6 @@ const PASOS = [
   { estado: 'FINALIZADO', etiqueta: 'Finalizado' },
 ];
 
-/** Línea de progreso del viaje. Un viaje cancelado se muestra aparte. */
 export default function EstadoViaje({ estado }) {
   if (estado === 'CANCELADO') {
     return <div className="insignia cancelado">Viaje cancelado</div>;

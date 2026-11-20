@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DolarApiGatewayImpl implements TipoCambioGateway {
-
-    /** El tipo de cambio del proveedor se actualiza una vez al día: una hora de caché es segura. */
     static final Duration TTL = Duration.ofHours(1);
 
     private final Map<String, TasaEnCache> cache = new ConcurrentHashMap<>();

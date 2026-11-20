@@ -10,12 +10,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-/**
- * Caso de uso CRUD del agregado Notificacion.
- */
 @RequiredArgsConstructor
 public class NotificacionCrudUseCase {
-
     private final NotificacionGateway notificacionGateway;
 
     public Notificacion crear(Notificacion notificacion) {

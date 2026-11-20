@@ -17,13 +17,8 @@ import com.uber.notificaciones.domain.usecase.VincularTelegramUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Registra los casos de uso (domain/usecase) como beans de Spring,
- * manteniendo el dominio libre de anotaciones de Spring.
- */
 @Configuration
 public class UseCaseConfig {
-
     @Bean
     public NotificacionSender notificacionSender(NotificacionGateway notificacionGateway,
                                                  TelegramGateway telegramGateway) {

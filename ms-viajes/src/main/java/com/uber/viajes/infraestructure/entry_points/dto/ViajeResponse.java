@@ -26,7 +26,6 @@ public record ViajeResponse(
         LocalDateTime fechaInicio,
         LocalDateTime fechaFin
 ) {
-
     public static ViajeResponse from(Viaje v) {
         return new ViajeResponse(
                 v.getId(),

@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 public class ConsultarTipoCambioUseCase {
-
     private final TipoCambioGateway tipoCambioGateway;
 
     public BigDecimal tipoCambio(String moneda) {

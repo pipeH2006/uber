@@ -9,16 +9,12 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Agregado raíz del subdominio de viajes.
- */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Viaje {
-
     private Long id;
     private Long pasajeroId;
     private Long conductorId;

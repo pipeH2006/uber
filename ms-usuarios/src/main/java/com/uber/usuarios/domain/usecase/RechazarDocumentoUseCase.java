@@ -7,12 +7,8 @@ import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Marca como RECHAZADO el documento (licencia) de un conductor. Se puede volver a verificar después.
- */
 @RequiredArgsConstructor
 public class RechazarDocumentoUseCase {
-
     private final UsuarioGateway usuarioGateway;
 
     public Usuario rechazarDocumento(Long id) {

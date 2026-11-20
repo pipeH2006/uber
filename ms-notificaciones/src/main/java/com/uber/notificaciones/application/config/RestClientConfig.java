@@ -19,7 +19,6 @@ import java.time.Duration;
 @EnableConfigurationProperties(ExternalProperties.class)
 @RequiredArgsConstructor
 public class RestClientConfig {
-
     private final ExternalProperties properties;
 
     @Bean

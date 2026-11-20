@@ -9,12 +9,8 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Caso de uso CRUD base del agregado Pago.
- */
 @RequiredArgsConstructor
 public class PagoCrudUseCase {
-
     private final PagoGateway pagoGateway;
 
     public Pago crear(Pago pago) {

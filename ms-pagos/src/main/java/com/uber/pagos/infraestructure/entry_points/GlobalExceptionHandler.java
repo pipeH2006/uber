@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(PagoNoEncontradoException.class)
     public ResponseEntity<ApiError> handleNoEncontrado(PagoNoEncontradoException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);

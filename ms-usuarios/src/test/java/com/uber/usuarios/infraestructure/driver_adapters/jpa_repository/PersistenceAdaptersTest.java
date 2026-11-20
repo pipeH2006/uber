@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import({UsuarioDataGatewayImpl.class, CalificacionDataGatewayImpl.class, MapperUsuario.class, MapperCalificacion.class})
 class PersistenceAdaptersTest {
-
     @Autowired
     private UsuarioDataGatewayImpl usuarioGateway;
 

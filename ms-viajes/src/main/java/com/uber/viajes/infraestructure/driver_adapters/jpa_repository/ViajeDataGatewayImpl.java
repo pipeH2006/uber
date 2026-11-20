@@ -12,7 +12,6 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class ViajeDataGatewayImpl implements ViajeGateway {
-
     private final ViajeDataJpaRepository repository;
     private final MapperViaje mapperViaje;
 

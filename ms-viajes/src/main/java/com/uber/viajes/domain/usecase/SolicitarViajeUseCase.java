@@ -17,7 +17,6 @@ import java.util.Locale;
 
 @RequiredArgsConstructor
 public class SolicitarViajeUseCase {
-
     private final EstimarViajeUseCase estimarViajeUseCase;
     private final NotificacionGateway notificacionGateway;
     private final ViajeGateway viajeGateway;
@@ -27,8 +26,6 @@ public class SolicitarViajeUseCase {
         validarPasajero(pasajeroId);
         validarConductor(conductorId);
 
-        // La estimación (ruta + tarifa USD/COP) se obtiene a través del caso de uso de estimación,
-        // que a su vez invoca RutasGateway.calcularRuta y TipoCambioGateway.obtenerTipoCambio("COP").
         Estimacion estimacion = estimarViajeUseCase.estimar(origen, destino);
 
         Viaje viaje = Viaje.builder()

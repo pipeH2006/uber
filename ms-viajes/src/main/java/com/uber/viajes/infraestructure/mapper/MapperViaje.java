@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MapperViaje {
-
     public Viaje toViaje(ViajeData data) {
         return Viaje.builder()
                 .id(data.getId())

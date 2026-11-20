@@ -9,7 +9,6 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 
 public class UsuarioGatewayImpl implements UsuarioGateway {
-
     private final RestClient restClient;
     private final String usuariosUrl;
 

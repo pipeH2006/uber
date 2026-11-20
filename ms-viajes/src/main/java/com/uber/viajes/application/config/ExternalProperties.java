@@ -9,7 +9,6 @@ public record ExternalProperties(
         String notificacionesUrl,
         String usuariosUrl
 ) {
-
     public ExternalProperties {
         if (osrmBaseUrl == null || osrmBaseUrl.isBlank()) {
             osrmBaseUrl = "https://router.project-osrm.org";

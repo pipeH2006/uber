@@ -9,13 +9,8 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-/**
- * Envía la notificación a ms-notificaciones sin bloquear al llamador: el mensaje lo redacta la IA y
- * se entrega por Telegram, lo que puede tardar varios segundos y no debe retrasar el viaje o el pago.
- */
 @Slf4j
 public class NotificacionRestGatewayImpl implements NotificacionGateway {
-
     private final RestClient restClient;
     private final String notificacionesUrl;
     private final Executor executor = Executors.newVirtualThreadPerTaskExecutor();

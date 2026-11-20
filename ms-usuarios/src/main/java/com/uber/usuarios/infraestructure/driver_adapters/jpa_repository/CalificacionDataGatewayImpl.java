@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class CalificacionDataGatewayImpl implements CalificacionGateway {
-
     private final CalificacionDataJpaRepository repository;
     private final MapperCalificacion mapperCalificacion;
 

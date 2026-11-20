@@ -2,10 +2,6 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Polyline } from 'react-leaflet';
 import api from '../api.js';
 
-/**
- * Mapa de solo lectura con origen (verde) y destino (rojo) de un viaje. Dibuja la ruta real por calles
- * (la que calcula OSRM); mientras carga, o si no está disponible, une origen y destino con una línea recta.
- */
 export default function MapaViaje({ viaje, altura = 220 }) {
   const [ruta, setRuta] = useState([]);
 
@@ -18,7 +14,6 @@ export default function MapaViaje({ viaje, altura = 220 }) {
         if (activo) setRuta((s.ruta || []).map((p) => [p.lat, p.lng]));
       })
       .catch(() => {
-        /* sin ruta: se queda la línea recta */
       });
     return () => {
       activo = false;

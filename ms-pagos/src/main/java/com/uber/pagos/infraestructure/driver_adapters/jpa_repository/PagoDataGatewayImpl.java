@@ -12,14 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Adaptador que implementa el gateway de salida {@link PagoGateway}
- * delegando en Spring Data JPA.
- */
 @Repository
 @RequiredArgsConstructor
 public class PagoDataGatewayImpl implements PagoGateway {
-
     private final PagoDataJpaRepository repository;
     private final MapperPago mapperPago;
 

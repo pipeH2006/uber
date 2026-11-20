@@ -11,7 +11,6 @@ import org.springframework.web.client.RestClient;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GroqRedactorGatewayImplTest {
-
     private MockWebServer server;
 
     @BeforeEach

@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SeguimientoViajeUseCaseTest {
-
     @Mock
     private ViajeGateway viajeGateway;
 

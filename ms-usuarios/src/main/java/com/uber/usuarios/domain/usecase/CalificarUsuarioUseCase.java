@@ -9,12 +9,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Caso de uso para calificar a un usuario.
- */
 @RequiredArgsConstructor
 public class CalificarUsuarioUseCase {
-
     private final UsuarioGateway usuarioGateway;
     private final CalificacionGateway calificacionGateway;
 

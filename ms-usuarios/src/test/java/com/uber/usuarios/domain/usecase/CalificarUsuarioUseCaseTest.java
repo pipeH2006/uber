@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CalificarUsuarioUseCaseTest {
-
     @Mock
     private UsuarioGateway usuarioGateway;
 

@@ -15,13 +15,8 @@ import com.uber.pagos.domain.usecase.ResumenIngresosUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Registra los casos de uso (domain/usecase) como beans de Spring,
- * manteniendo el dominio libre de anotaciones de Spring.
- */
 @Configuration
 public class UseCaseConfig {
-
     @Bean
     public PagoCrudUseCase pagoCrudUseCase(PagoGateway pagoGateway) {
         return new PagoCrudUseCase(pagoGateway);

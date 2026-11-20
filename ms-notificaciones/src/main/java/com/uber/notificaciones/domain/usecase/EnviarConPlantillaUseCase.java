@@ -9,13 +9,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-/**
- * Caso de uso que resuelve una plantilla, reemplaza sus marcadores y envía
- * la notificación resultante.
- */
 @RequiredArgsConstructor
 public class EnviarConPlantillaUseCase {
-
     private final PlantillaGateway plantillaGateway;
     private final EnviarNotificacionUseCase enviarNotificacion;
 

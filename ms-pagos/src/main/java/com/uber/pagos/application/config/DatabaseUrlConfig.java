@@ -10,13 +10,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-/**
- * Soporta la URL de conexión de Render/Heroku ({@code postgres://} o
- * {@code postgresql://}) convirtiéndola a una URL JDBC estándar.
- */
 @Configuration
 public class DatabaseUrlConfig {
-
     @Bean
     public DataSource dataSource(DataSourceProperties properties) {
         String url = properties.getUrl();
@@ -55,10 +50,6 @@ public class DatabaseUrlConfig {
         return new DatabaseUrl(jdbcUrl, username, password);
     }
 
-    /**
-     * Conserva los parámetros de la URL (p. ej. {@code sslmode=require} de Neon) y descarta
-     * {@code channel_binding}, que el driver JDBC de PostgreSQL no reconoce.
-     */
     private static String cleanQuery(String rawQuery) {
         if (rawQuery == null || rawQuery.isBlank()) {
             return "";

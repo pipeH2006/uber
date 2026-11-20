@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(NotificacionNoEncontradaException.class)
     public ResponseEntity<ApiError> handleNoEncontrada(NotificacionNoEncontradaException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);

@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import({PagoDataGatewayImpl.class, MapperPago.class})
 class PagoPersistenceAdapterTest {
-
     @Autowired
     private PagoDataGatewayImpl gateway;
 
@@ -95,7 +94,6 @@ class PagoPersistenceAdapterTest {
                 .estado(EstadoPago.APROBADO)
                 .fecha(LocalDateTime.of(2026, 11, 11, 18, 0))
                 .build());
-        // No debe aparecer: otro estado y otra fecha
         gateway.guardar(Pago.builder()
                 .viajeId(13L)
                 .usuarioId(5L)

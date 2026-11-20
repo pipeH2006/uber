@@ -12,7 +12,6 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class UsuarioDataGatewayImpl implements UsuarioGateway {
-
     private final UsuarioDataJpaRepository repository;
     private final MapperUsuario mapperUsuario;
 

@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import({ViajeDataGatewayImpl.class, MapperViaje.class})
 class ViajeDataGatewayImplTest {
-
     @Autowired
     private ViajeDataGatewayImpl gateway;
 

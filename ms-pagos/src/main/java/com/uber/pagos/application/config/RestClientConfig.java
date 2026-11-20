@@ -21,7 +21,6 @@ import java.time.Duration;
 @Configuration
 @EnableConfigurationProperties(ExternalProperties.class)
 public class RestClientConfig {
-
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
     private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
 

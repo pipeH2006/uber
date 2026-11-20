@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OsrmGatewayImplTest {
-
     private MockWebServer mockWebServer;
     private RestClient restClient;
 
@@ -46,7 +45,6 @@ class OsrmGatewayImplTest {
 
         assertThat(ruta.distanciaKm()).isEqualTo(12.5);
         assertThat(ruta.duracionMin()).isEqualTo(15.0);
-        // GeoJSON [lng, lat] -> Coordenada(lat, lng)
         assertThat(ruta.puntos()).containsExactly(
                 new Coordenada(4.71, -74.07), new Coordenada(4.65, -74.075), new Coordenada(4.6, -74.08));
 

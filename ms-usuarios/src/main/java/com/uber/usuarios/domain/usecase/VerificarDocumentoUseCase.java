@@ -9,12 +9,8 @@ import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Caso de uso para verificar el documento (licencia) de un conductor.
- */
 @RequiredArgsConstructor
 public class VerificarDocumentoUseCase {
-
     private final UsuarioGateway usuarioGateway;
 
     public Usuario verificarDocumento(Long id) {

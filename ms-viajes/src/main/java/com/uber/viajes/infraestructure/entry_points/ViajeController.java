@@ -35,7 +35,6 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ViajeController {
-
     private final ViajeCrudUseCase crudUseCase;
     private final EstimarViajeUseCase estimarUseCase;
     private final SolicitarViajeUseCase solicitarUseCase;
@@ -43,8 +42,6 @@ public class ViajeController {
     private final FinalizarViajeUseCase finalizarUseCase;
     private final CancelarViajeUseCase cancelarUseCase;
     private final SeguimientoViajeUseCase seguimientoUseCase;
-
-    // ---- CRUD base ----
 
     @PostMapping("/viajes")
     public ResponseEntity<ViajeResponse> crear(@Valid @RequestBody CrearViajeRequest request) {
@@ -86,8 +83,6 @@ public class ViajeController {
         crudUseCase.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ---- APIs de dominio (no CRUD) ----
 
     @PostMapping("/viajes/estimar")
     public ResponseEntity<Estimacion> estimar(@Valid @RequestBody EstimarViajeRequest request) {

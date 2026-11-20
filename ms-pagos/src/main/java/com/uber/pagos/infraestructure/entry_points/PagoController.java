@@ -39,7 +39,6 @@ import java.util.List;
 @RequestMapping("/api/v1/pagos")
 @RequiredArgsConstructor
 public class PagoController {
-
     private final PagoCrudUseCase crudUseCase;
     private final ProcesarPagoUseCase procesarUseCase;
     private final ReembolsarPagoUseCase reembolsarUseCase;
@@ -47,8 +46,6 @@ public class PagoController {
     private final EvaluarFraudeUseCase fraudeUseCase;
     private final ConsultarTipoCambioUseCase tipoCambioUseCase;
     private final ResumenIngresosUseCase resumenUseCase;
-
-    // ---- CRUD base ----
 
     @PostMapping
     public ResponseEntity<PagoResponse> crear(@Valid @RequestBody PagoRequest request) {
@@ -87,8 +84,6 @@ public class PagoController {
         crudUseCase.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ---- APIs de dominio (no CRUD) ----
 
     @PostMapping("/procesar")
     public ResponseEntity<PagoResponse> procesar(@Valid @RequestBody ProcesarPagoRequest request) {

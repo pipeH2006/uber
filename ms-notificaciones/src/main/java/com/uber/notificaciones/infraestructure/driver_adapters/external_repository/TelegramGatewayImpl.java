@@ -15,15 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Adaptador del gateway {@link TelegramGateway} que invoca la API de
- * Telegram mediante {@link RestClient}. Se registra como bean en
- * {@code RestClientConfig}.
- */
 @Slf4j
 @RequiredArgsConstructor
 public class TelegramGatewayImpl implements TelegramGateway {
-
     private final RestClient telegramRestClient;
     private final ExternalProperties properties;
 

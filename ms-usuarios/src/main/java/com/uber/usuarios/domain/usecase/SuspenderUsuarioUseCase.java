@@ -7,12 +7,8 @@ import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Bloquea una cuenta. Un usuario suspendido no puede iniciar sesión y se puede reactivar con «activar».
- */
 @RequiredArgsConstructor
 public class SuspenderUsuarioUseCase {
-
     private final UsuarioGateway usuarioGateway;
 
     public Usuario suspender(Long id) {

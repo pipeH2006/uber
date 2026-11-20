@@ -9,13 +9,8 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Redacta los mensajes con Groq (modelos open source, API compatible con OpenAI).
- * Es best-effort: ante cualquier problema devuelve el mensaje original.
- */
 @Slf4j
 public class GroqRedactorGatewayImpl implements RedactorGateway {
-
     private static final String MODEL = "openai/gpt-oss-120b";
     private static final int MAX_CARACTERES = 600;
     private static final String SYSTEM_PROMPT =

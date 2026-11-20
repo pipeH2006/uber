@@ -9,14 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Adaptador que implementa el gateway {@link PlantillaGateway}
- * delegando en Spring Data JPA.
- */
 @Repository
 @RequiredArgsConstructor
 public class PlantillaDataGatewayImpl implements PlantillaGateway {
-
     private final PlantillaDataJpaRepository repository;
     private final MapperPlantilla mapperPlantilla;
 

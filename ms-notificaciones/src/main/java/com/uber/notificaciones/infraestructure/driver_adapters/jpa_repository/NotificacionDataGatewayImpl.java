@@ -9,14 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Adaptador que implementa el gateway {@link NotificacionGateway}
- * delegando en Spring Data JPA.
- */
 @Repository
 @RequiredArgsConstructor
 public class NotificacionDataGatewayImpl implements NotificacionGateway {
-
     private final NotificacionDataJpaRepository repository;
     private final MapperNotificacion mapperNotificacion;
 

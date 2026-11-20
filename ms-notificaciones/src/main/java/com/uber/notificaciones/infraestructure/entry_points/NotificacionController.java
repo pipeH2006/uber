@@ -33,7 +33,6 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class NotificacionController {
-
     private final NotificacionCrudUseCase crudUseCase;
     private final EnviarNotificacionUseCase enviarUseCase;
     private final EnviarNotificacionMasivaUseCase enviarMasivoUseCase;
@@ -41,8 +40,6 @@ public class NotificacionController {
     private final ReintentarNotificacionUseCase reintentarUseCase;
     private final ListarPlantillasUseCase listarPlantillasUseCase;
     private final EnviarConPlantillaUseCase enviarConPlantillaUseCase;
-
-    // ---- CRUD base ----
 
     @PostMapping("/notificaciones")
     public ResponseEntity<NotificacionResponse> crear(@Valid @RequestBody NotificacionRequest request) {
@@ -75,8 +72,6 @@ public class NotificacionController {
         crudUseCase.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ---- APIs de envío ----
 
     @PostMapping("/notificaciones/enviar")
     public ResponseEntity<NotificacionResponse> enviar(@Valid @RequestBody EnviarRequest request) {

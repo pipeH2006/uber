@@ -7,12 +7,8 @@ import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * Caso de uso de autenticación (login).
- */
 @RequiredArgsConstructor
 public class LoginUseCase {
-
     private final UsuarioGateway usuarioGateway;
     private final PasswordEncoder passwordEncoder;
 

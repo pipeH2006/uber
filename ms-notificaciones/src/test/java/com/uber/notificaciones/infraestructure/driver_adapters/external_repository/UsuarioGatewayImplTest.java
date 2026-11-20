@@ -13,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UsuarioGatewayImplTest {
-
     private MockWebServer server;
     private UsuarioGatewayImpl gateway;
 

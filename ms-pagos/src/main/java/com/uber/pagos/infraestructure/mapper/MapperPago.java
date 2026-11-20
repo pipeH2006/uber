@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MapperPago {
-
     public Pago toPago(PagoData data) {
         return Pago.builder()
                 .id(data.getId())

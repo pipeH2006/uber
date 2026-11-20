@@ -42,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(NotificacionController.class)
 class NotificacionControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -91,8 +90,6 @@ class NotificacionControllerTest {
                 .mensaje("Hola {nombre}, bienvenido a Uber")
                 .build();
     }
-
-    // ---- CRUD ----
 
     @Test
     void crear_devuelve201() throws Exception {
@@ -164,8 +161,6 @@ class NotificacionControllerTest {
         mockMvc.perform(delete("/api/v1/notificaciones/1"))
                 .andExpect(status().isNoContent());
     }
-
-    // ---- Envío ----
 
     @Test
     void enviar_devuelve200() throws Exception {

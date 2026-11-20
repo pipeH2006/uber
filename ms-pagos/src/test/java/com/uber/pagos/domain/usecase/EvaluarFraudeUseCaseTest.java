@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EvaluarFraudeUseCaseTest {
-
     @Mock
     private PagoGateway pagoGateway;
 

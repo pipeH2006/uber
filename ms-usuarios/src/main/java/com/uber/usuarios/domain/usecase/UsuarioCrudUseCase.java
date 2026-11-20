@@ -13,12 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Caso de uso CRUD del agregado Usuario.
- */
 @RequiredArgsConstructor
 public class UsuarioCrudUseCase {
-
     private final UsuarioGateway usuarioGateway;
     private final PasswordEncoder passwordEncoder;
 
@@ -79,11 +75,6 @@ public class UsuarioCrudUseCase {
         usuarioGateway.eliminar(id);
     }
 
-    /**
-     * Usuarios cuyo teléfono coincide con el dado, ignorando espacios, signos y el indicativo del país
-     * (p. ej. «573001234567» coincide con «300 123 4567»). Pueden ser varios si una misma persona se
-     * registró con más de un rol.
-     */
     public List<Usuario> buscarPorTelefono(String telefono) {
         String buscado = soloDigitos(telefono);
         if (buscado.length() < MIN_DIGITOS_TELEFONO) {

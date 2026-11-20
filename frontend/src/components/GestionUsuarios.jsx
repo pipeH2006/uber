@@ -15,10 +15,6 @@ const CLASE_DOCUMENTO = {
   NO_APLICA: 'neutro',
 };
 
-/**
- * Gestión de usuarios: ver todas las cuentas y cambiar su estado y el estado del documento del conductor.
- * Los botones solo aparecen cuando la transición es válida (el backend aplica las mismas reglas).
- */
 export default function GestionUsuarios({ usuarios, refrescar }) {
   const [filtroRol, setFiltroRol] = useState('TODOS');
   const [busqueda, setBusqueda] = useState('');

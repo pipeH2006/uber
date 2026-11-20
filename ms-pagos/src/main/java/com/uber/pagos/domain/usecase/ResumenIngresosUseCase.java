@@ -11,7 +11,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class ResumenIngresosUseCase {
-
     private final PagoGateway pagoGateway;
 
     public ResumenIngresos resumen(LocalDate fecha) {

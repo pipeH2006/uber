@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SolicitarViajeUseCaseTest {
-
     @Mock
     private EstimarViajeUseCase estimarViajeUseCase;
 

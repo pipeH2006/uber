@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import api, { BOT_USERNAME } from '../api.js';
 
-/**
- * Elegir quién eres (usuario existente o nuevo registro) y vincular tu Telegram.
- * Telegram solo permite escribirle a quien abrió el bot: el botón abre
- * t.me/<bot>?start=<id> y ms-notificaciones guarda el chat al recibir el /start.
- */
 export default function IdentidadUsuario({ rol, etiqueta, usuarios, seleccionadoId, onSeleccionar, onCambio }) {
   const [registrando, setRegistrando] = useState(false);
   const [cargando, setCargando] = useState(false);

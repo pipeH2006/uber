@@ -11,13 +11,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Caso de uso que envía una notificación a múltiples destinatarios.
- * El fallo de un destinatario no aborta el envío del resto.
- */
 @RequiredArgsConstructor
 public class EnviarNotificacionMasivaUseCase {
-
     private final NotificacionGateway notificacionGateway;
     private final NotificacionSender sender;
 

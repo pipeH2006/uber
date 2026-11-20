@@ -7,12 +7,8 @@ import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Caso de uso para activar la cuenta de un usuario.
- */
 @RequiredArgsConstructor
 public class ActivarUsuarioUseCase {
-
     private final UsuarioGateway usuarioGateway;
 
     public Usuario activar(Long id) {

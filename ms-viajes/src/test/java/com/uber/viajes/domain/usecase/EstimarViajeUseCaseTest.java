@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EstimarViajeUseCaseTest {
-
     @Mock
     private RutasGateway rutasGateway;
 
@@ -44,7 +43,6 @@ class EstimarViajeUseCaseTest {
 
         Estimacion estimacion = useCase.estimar(origen, destino);
 
-        // 2.50 + 0.80*10 + 0.15*20 = 13.50
         assertThat(estimacion.distanciaKm()).isEqualTo(10.0);
         assertThat(estimacion.duracionMin()).isEqualTo(20.0);
         assertThat(estimacion.costoUSD()).isEqualByComparingTo("13.50");
@@ -61,7 +59,6 @@ class EstimarViajeUseCaseTest {
 
         Estimacion estimacion = useCase.estimar(origen, destino);
 
-        // 2.50 + 0.80*5 + 0.15*7.5 = 2.50 + 4.00 + 1.125 = 7.625 -> 7.63
         assertThat(estimacion.costoUSD()).isEqualByComparingTo("7.63");
     }
 

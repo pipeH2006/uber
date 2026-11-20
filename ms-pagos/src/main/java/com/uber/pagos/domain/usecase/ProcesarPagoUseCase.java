@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class ProcesarPagoUseCase {
-
     private final PagoGateway pagoGateway;
     private final NotificacionGateway notificacionGateway;
     private final UsuarioGateway usuarioGateway;

@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UsuarioGatewayImplTest {
-
     private MockWebServer mockWebServer;
     private UsuarioGatewayImpl gateway;
 
@@ -35,8 +34,6 @@ class UsuarioGatewayImplTest {
     private static MockResponse json(String body) {
         return new MockResponse().setHeader("Content-Type", "application/json").setBody(body);
     }
-
-    // ---- usuarioExiste ----
 
     @Test
     void usuarioExiste_respuesta200_devuelveTrue() throws Exception {
@@ -78,8 +75,6 @@ class UsuarioGatewayImplTest {
         assertThat(sinUrl.usuarioExiste(7L)).isTrue();
         assertThat(mockWebServer.getRequestCount()).isZero();
     }
-
-    // ---- obtenerChatIdTelegram ----
 
     @Test
     void obtenerChatIdTelegram_usuarioConChat_devuelveChatId() throws Exception {

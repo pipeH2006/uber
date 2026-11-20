@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 public class IniciarViajeUseCase {
-
     private final ViajeGateway viajeGateway;
     private final NotificacionGateway notificacionGateway;
     private final UsuarioGateway usuarioGateway;

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MapperUsuario {
-
     public Usuario toUsuario(UsuarioData data) {
         return Usuario.builder()
                 .id(data.getId())

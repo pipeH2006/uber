@@ -10,7 +10,6 @@ public record ExternalProperties(
         String notificacionesUrl,
         String usuariosUrl
 ) {
-
     public ExternalProperties {
         if (dolarBaseUrl == null || dolarBaseUrl.isBlank()) {
             dolarBaseUrl = "https://open.er-api.com";

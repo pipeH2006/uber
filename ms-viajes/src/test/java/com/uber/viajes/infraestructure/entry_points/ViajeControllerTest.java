@@ -42,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ViajeController.class)
 class ViajeControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 

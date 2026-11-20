@@ -9,17 +9,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Vincula el chat de Telegram de un usuario de dos maneras:
- * <ul>
- *   <li>Enlace {@code t.me/<bot>?start=<usuarioId>}: Telegram entrega {@code /start <usuarioId>}.</li>
- *   <li>Contacto: con {@code /start} a secas el bot pide compartir el número y se busca el usuario
- *       registrado con ese teléfono.</li>
- * </ul>
- */
 @RequiredArgsConstructor
 public class VincularTelegramUseCase {
-
     private static final Pattern START_CON_ID = Pattern.compile("^/start\\s+(\\d{1,18})\\s*$");
     private static final Pattern START_SIN_ID = Pattern.compile("^/start\\s*$");
 
@@ -41,11 +32,6 @@ public class VincularTelegramUseCase {
     private final TelegramGateway telegramGateway;
     private final UsuarioGateway usuarioGateway;
 
-    /**
-     * Procesa los mensajes nuevos del bot.
-     *
-     * @return el siguiente offset a consultar
-     */
     public long procesarActualizaciones(long offset) {
         long siguiente = offset;
         for (ActualizacionTelegram actualizacion : telegramGateway.obtenerActualizaciones(offset)) {
@@ -98,7 +84,6 @@ public class VincularTelegramUseCase {
         try {
             telegramGateway.solicitarContacto(chatId, MENSAJE_PEDIR_CONTACTO);
         } catch (EnvioNotificacionException e) {
-            // Si no se pudo enviar el botón, el usuario puede volver a escribir /start.
         }
     }
 
@@ -106,7 +91,6 @@ public class VincularTelegramUseCase {
         try {
             telegramGateway.enviar(chatId, texto);
         } catch (EnvioNotificacionException e) {
-            // La vinculación ya quedó guardada; el aviso de confirmación es opcional.
         }
     }
 }

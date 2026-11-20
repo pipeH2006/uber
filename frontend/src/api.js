@@ -3,7 +3,6 @@ const VIAJES = import.meta.env.VITE_VIAJES_URL || 'https://uber-ms-viajes.onrend
 const PAGOS = import.meta.env.VITE_PAGOS_URL || 'https://uber-ms-pagos.onrender.com';
 const NOTIF = import.meta.env.VITE_NOTIF_URL || 'https://uber-ms-notificaciones.onrender.com';
 
-/** Usuario del bot de Telegram al que se vinculan los usuarios (sin @). */
 export const BOT_USERNAME = import.meta.env.VITE_BOT_USERNAME || 'pipeH2006_uber_bot';
 
 async function request(url, options = {}) {
@@ -17,7 +16,6 @@ async function request(url, options = {}) {
       const body = await res.json();
       message = body.message || message;
     } catch {
-      /* ignore */
     }
     throw new Error(message);
   }
@@ -26,7 +24,6 @@ async function request(url, options = {}) {
 }
 
 export const api = {
-  // Usuarios
   registrarUsuario: (data) =>
     request(`${USUARIOS}/api/v1/usuarios`, { method: 'POST', body: JSON.stringify(data) }),
   listarUsuarios: () => request(`${USUARIOS}/api/v1/usuarios`),
@@ -38,7 +35,6 @@ export const api = {
   rechazarDocumento: (id) =>
     request(`${USUARIOS}/api/v1/usuarios/${id}/rechazar-documento`, { method: 'POST' }),
 
-  // Viajes
   estimar: (data) =>
     request(`${VIAJES}/api/v1/viajes/estimar`, { method: 'POST', body: JSON.stringify(data) }),
   solicitar: (data) =>
@@ -49,14 +45,12 @@ export const api = {
   seguimiento: (id) => request(`${VIAJES}/api/v1/viajes/${id}/seguimiento`),
   listarViajes: () => request(`${VIAJES}/api/v1/viajes`),
 
-  // Pagos
   procesarPago: (data) =>
     request(`${PAGOS}/api/v1/pagos/procesar`, { method: 'POST', body: JSON.stringify(data) }),
   evaluarFraude: (id) => request(`${PAGOS}/api/v1/pagos/${id}/evaluar-fraude`, { method: 'POST' }),
   tipoCambio: (moneda) => request(`${PAGOS}/api/v1/pagos/tipo-cambio?moneda=${moneda}`),
   listarPagos: () => request(`${PAGOS}/api/v1/pagos`),
 
-  // Notificaciones
   enviarNotificacion: (data) =>
     request(`${NOTIF}/api/v1/notificaciones/enviar`, { method: 'POST', body: JSON.stringify(data) }),
 };

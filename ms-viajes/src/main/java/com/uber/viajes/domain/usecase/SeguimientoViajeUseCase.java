@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SeguimientoViajeUseCase {
-
     private final ViajeGateway viajeGateway;
     private final RutasGateway rutasGateway;
 

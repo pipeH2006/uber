@@ -37,7 +37,6 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UsuarioController {
-
     private final UsuarioCrudUseCase crudUseCase;
     private final LoginUseCase loginUseCase;
     private final ActivarUsuarioUseCase activarUseCase;
@@ -47,8 +46,6 @@ public class UsuarioController {
     private final RechazarDocumentoUseCase rechazarDocumentoUseCase;
     private final CalificarUsuarioUseCase calificarUseCase;
     private final ObtenerCalificacionPromedioUseCase promedioUseCase;
-
-    // ---- CRUD base ----
 
     @PostMapping("/usuarios")
     public ResponseEntity<UsuarioResponse> registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
@@ -95,8 +92,6 @@ public class UsuarioController {
         crudUseCase.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ---- APIs de dominio (no CRUD) ----
 
     @PostMapping("/auth/login")
     public ResponseEntity<UsuarioResponse> login(@Valid @RequestBody LoginRequest request) {

@@ -7,13 +7,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Inserta las plantillas por defecto al arrancar la aplicación.
- */
 @Configuration
 @RequiredArgsConstructor
 public class PlantillaDataSeeder {
-
     private final PlantillaGateway plantillaGateway;
 
     @Bean

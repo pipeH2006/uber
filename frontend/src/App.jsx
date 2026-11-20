@@ -5,10 +5,6 @@ import PanelConductor from './components/PanelConductor.jsx';
 import PanelPasajero from './components/PanelPasajero.jsx';
 import usePolling from './hooks/usePolling.js';
 
-/**
- * Pantalla dividida: pasajero a la izquierda y conductor a la derecha. Ambos paneles comparten
- * los datos que se consultan cada pocos segundos, así que una acción de un lado se ve en el otro.
- */
 export default function App() {
   const [vista, setVista] = useState('viajes');
   const usuarios = usePolling(api.listarUsuarios, 4000, []);

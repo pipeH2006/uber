@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NotificacionRestGatewayAsyncTest {
-
     private MockWebServer mockWebServer;
 
     @BeforeEach

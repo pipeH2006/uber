@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 public class GenerarFacturaUseCase {
-
     private final PagoGateway pagoGateway;
     private final TipoCambioGateway tipoCambioGateway;
 

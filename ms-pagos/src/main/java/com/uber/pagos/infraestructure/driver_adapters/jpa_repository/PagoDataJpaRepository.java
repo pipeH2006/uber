@@ -7,6 +7,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PagoDataJpaRepository extends JpaRepository<PagoData, Long> {
-
     List<PagoData> findByEstadoAndFechaBetween(EstadoPago estado, LocalDateTime inicio, LocalDateTime fin);
 }

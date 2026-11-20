@@ -7,12 +7,8 @@ import com.uber.notificaciones.domain.model.Notificacion;
 import com.uber.notificaciones.domain.model.gateway.NotificacionGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Caso de uso para reintentar el envío de una notificación fallida.
- */
 @RequiredArgsConstructor
 public class ReintentarNotificacionUseCase {
-
     private final NotificacionGateway notificacionGateway;
     private final NotificacionSender sender;
 

@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GroqFraudeGatewayImplTest {
-
     private final ObjectMapper objectMapper = new ObjectMapper();
     private MockWebServer server;
     private RestClient restClient;

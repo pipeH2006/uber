@@ -18,7 +18,6 @@ public record UsuarioResponse(
         EstadoDocumento estadoDocumento,
         LocalDateTime fechaRegistro
 ) {
-
     public static UsuarioResponse from(Usuario u) {
         return new UsuarioResponse(
                 u.getId(),

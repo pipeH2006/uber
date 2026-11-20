@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Slf4j
 public class UsuarioGatewayImpl implements UsuarioGateway {
-
     private final RestClient restClient;
     private final String usuariosUrl;
 

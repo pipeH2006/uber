@@ -6,15 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Consulta periódicamente los mensajes nuevos del bot para vincular a los usuarios que abren
- * el enlace «Vincular Telegram». Usa polling (no webhook) para funcionar igual en local y en Render.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TelegramUpdatesPoller {
-
     private final VincularTelegramUseCase vincularTelegramUseCase;
 
     private long offset = 0;

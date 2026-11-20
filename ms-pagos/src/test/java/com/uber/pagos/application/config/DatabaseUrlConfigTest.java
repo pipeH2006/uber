@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DatabaseUrlConfigTest {
-
     @Test
     void parse_urlPostgresql_convierteAJdbc() {
         DatabaseUrl result = DatabaseUrlConfig.parse("postgresql://usuario:clave@host-ejemplo:5432/midb");

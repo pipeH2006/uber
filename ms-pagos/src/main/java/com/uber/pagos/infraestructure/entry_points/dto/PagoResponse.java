@@ -19,7 +19,6 @@ public record PagoResponse(
         String referencia,
         String riesgoFraude
 ) {
-
     public static PagoResponse from(Pago p) {
         return new PagoResponse(
                 p.getId(),

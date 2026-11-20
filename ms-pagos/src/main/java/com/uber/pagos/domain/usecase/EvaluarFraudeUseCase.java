@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class EvaluarFraudeUseCase {
-
     private final PagoGateway pagoGateway;
     private final FraudeGateway fraudeGateway;
 

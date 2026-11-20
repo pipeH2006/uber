@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MapperPlantilla {
-
     public Plantilla toPlantilla(PlantillaData data) {
         return Plantilla.builder()
                 .id(data.getId())

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ReembolsarPagoUseCase {
-
     private final PagoGateway pagoGateway;
 
     public Pago reembolsar(Long id) {

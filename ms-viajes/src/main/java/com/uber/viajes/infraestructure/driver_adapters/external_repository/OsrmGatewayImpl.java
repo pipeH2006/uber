@@ -11,15 +11,8 @@ import org.springframework.web.client.RestClient;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adaptador del gateway de rutas usando OSRM (Open Source Routing Machine),
- * un motor de enrutamiento open source basado en OpenStreetMap.
- *
- * <p>No requiere API key: usa el servidor público de demostración de OSRM.
- */
 @Slf4j
 public class OsrmGatewayImpl implements RutasGateway {
-
     private static final String RUTA_DRIVING = "route/v1/driving";
 
     private final RestClient restClient;
@@ -30,7 +23,6 @@ public class OsrmGatewayImpl implements RutasGateway {
 
     @Override
     public Ruta calcularRuta(Coordenada origen, Coordenada destino) {
-        // OSRM usa el orden (longitud,latitud)
         String coordenadas = origen.lng() + "," + origen.lat()
                 + ";" + destino.lng() + "," + destino.lat();
         String path = RUTA_DRIVING + "/" + coordenadas + "?overview=full&geometries=geojson";
@@ -50,7 +42,6 @@ public class OsrmGatewayImpl implements RutasGateway {
         return new Ruta(metros / 1000.0, segundos / 60.0, trazado(root.path("routes").path(0).path("geometry")));
     }
 
-    /** GeoJSON usa [longitud, latitud]; el dominio usa (latitud, longitud). */
     private static List<Coordenada> trazado(JsonNode geometry) {
         List<Coordenada> puntos = new ArrayList<>();
         for (JsonNode punto : geometry.path("coordinates")) {

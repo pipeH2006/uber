@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ViajeNoEncontradoException.class)
     public ResponseEntity<ApiError> handleNoEncontrado(ViajeNoEncontradoException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);

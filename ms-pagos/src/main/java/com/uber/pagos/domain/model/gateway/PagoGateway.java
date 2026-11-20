@@ -6,11 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Puerto de salida (gateway) hacia la persistencia de pagos.
- */
 public interface PagoGateway {
-
     Pago guardar(Pago pago);
 
     Optional<Pago> buscarPorId(Long id);

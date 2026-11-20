@@ -8,7 +8,6 @@ public record PlantillaResponse(
         String asunto,
         String mensaje
 ) {
-
     public static PlantillaResponse from(Plantilla p) {
         return new PlantillaResponse(p.getId(), p.getCodigo(), p.getAsunto(), p.getMensaje());
     }

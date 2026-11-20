@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VincularTelegramUseCaseTest {
-
     @Mock
     private TelegramGateway telegramGateway;
 

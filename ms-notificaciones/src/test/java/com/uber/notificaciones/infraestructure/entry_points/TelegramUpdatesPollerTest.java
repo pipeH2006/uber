@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TelegramUpdatesPollerTest {
-
     @Mock
     private VincularTelegramUseCase vincularTelegramUseCase;
 

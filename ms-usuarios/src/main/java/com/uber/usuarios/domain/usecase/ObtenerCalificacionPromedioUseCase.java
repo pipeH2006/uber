@@ -9,12 +9,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-/**
- * Caso de uso para obtener el promedio de calificaciones de un usuario.
- */
 @RequiredArgsConstructor
 public class ObtenerCalificacionPromedioUseCase {
-
     private final UsuarioGateway usuarioGateway;
     private final CalificacionGateway calificacionGateway;
 

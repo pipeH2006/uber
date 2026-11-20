@@ -12,7 +12,6 @@ import java.math.RoundingMode;
 
 @RequiredArgsConstructor
 public class EstimarViajeUseCase {
-
     private static final BigDecimal TARIFA_BASE = new BigDecimal("2.50");
     private static final BigDecimal TARIFA_POR_KM = new BigDecimal("0.80");
     private static final BigDecimal TARIFA_POR_MINUTO = new BigDecimal("0.15");

@@ -9,12 +9,8 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Caso de uso CRUD del agregado Viaje.
- */
 @RequiredArgsConstructor
 public class ViajeCrudUseCase {
-
     private final ViajeGateway viajeGateway;
 
     public Viaje crear(Viaje viaje) {

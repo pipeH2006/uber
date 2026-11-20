@@ -17,7 +17,6 @@ public record NotificacionResponse(
         LocalDateTime fechaEnvio,
         int intentos
 ) {
-
     public static NotificacionResponse from(Notificacion n) {
         return new NotificacionResponse(
                 n.getId(),

@@ -15,13 +15,8 @@ import com.uber.viajes.domain.usecase.ViajeCrudUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Registra los casos de uso (domain/usecase) como beans de Spring,
- * manteniendo el dominio libre de anotaciones de Spring.
- */
 @Configuration
 public class UseCaseConfig {
-
     @Bean
     public ViajeCrudUseCase viajeCrudUseCase(ViajeGateway viajeGateway) {
         return new ViajeCrudUseCase(viajeGateway);

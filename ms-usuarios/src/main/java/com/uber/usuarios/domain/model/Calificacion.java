@@ -8,16 +8,12 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Calificación otorgada a un usuario (pasajero o conductor) por otro usuario.
- */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Calificacion {
-
     private Long id;
     private Long usuarioId;
     private Long calificadorId;

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MapperNotificacion {
-
     public Notificacion toNotificacion(NotificacionData data) {
         return Notificacion.builder()
                 .id(data.getId())

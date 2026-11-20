@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Consulta `fn` al montar y cada `intervaloMs`. Devuelve los datos, el último error y una función
- * `refrescar` para volver a consultar de inmediato (por ejemplo, tras una acción del usuario).
- */
 export default function usePolling(fn, intervaloMs, inicial) {
   const [data, setData] = useState(inicial);
   const [error, setError] = useState(null);

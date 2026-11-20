@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import({NotificacionDataGatewayImpl.class, PlantillaDataGatewayImpl.class, MapperNotificacion.class, MapperPlantilla.class})
 class PersistenceAdaptersTest {
-
     @Autowired
     private NotificacionDataGatewayImpl notificacionGateway;
 

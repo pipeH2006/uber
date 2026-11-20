@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ViajeGateway {
-
     Viaje guardar(Viaje viaje);
 
     Optional<Viaje> buscarPorId(Long id);

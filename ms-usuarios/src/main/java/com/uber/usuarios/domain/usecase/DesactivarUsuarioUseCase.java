@@ -7,12 +7,8 @@ import com.uber.usuarios.domain.model.Usuario;
 import com.uber.usuarios.domain.model.gateway.UsuarioGateway;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Caso de uso para desactivar la cuenta de un usuario.
- */
 @RequiredArgsConstructor
 public class DesactivarUsuarioUseCase {
-
     private final UsuarioGateway usuarioGateway;
 
     public Usuario desactivar(Long id) {

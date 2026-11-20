@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DolarApiGatewayImplTest {
-
     private MockWebServer mockWebServer;
     private DolarApiGatewayImpl gateway;
 
@@ -133,7 +132,6 @@ class DolarApiGatewayImplTest {
     }
 
     private static final class RelojMutable extends Clock {
-
         private Instant ahora = Instant.parse("2026-01-01T00:00:00Z");
 
         void avanzar(Duration duracion) {

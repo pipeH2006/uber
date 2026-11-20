@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EnviarNotificacionUseCaseTest {
-
     @Mock
     private NotificacionGateway notificacionGateway;
 
